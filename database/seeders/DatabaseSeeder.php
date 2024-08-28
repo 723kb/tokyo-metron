@@ -12,8 +12,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
+        // ユーザーのシーディング
+        \App\Models\User::factory(10)->create();
+        // 各テーブルのシーダー呼び出し
+        $this->call(
+            [
+                LinesTableSeeder::class,
+                StatusUpdatesTableSeeder::class,
+                CommentsTableSeeder::class,
+                LikesTableSeeder::class,
+                UserLineSettingsTableSeeder::class,
+                LineNotifyTokensTableSeeder::class,
+            ]
+        );
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
