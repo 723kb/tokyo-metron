@@ -7,7 +7,6 @@ use Illuminate\Database\Seeder;
 use App\Models\Like;
 use App\Models\Comment;
 use App\Models\User;
-use Faker\Factory as Faker;
 
 class LikesTableSeeder extends Seeder
 {
@@ -16,20 +15,18 @@ class LikesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Faker::create('ja_JP');
-        
-        // 外部キーの使用 各モデルから全ユーザーのidのみ取得→配列に変換
-        $users = User::pluck('id')->toArray();  // ::はモデルクラスを指す  = そのテーブル
+        $users = User::pluck('id')->toArray();
         $comments = Comment::pluck('id')->toArray();
         
-        // いいねの生成
         for ($i = 0; $i < 50; $i++) {
-            Like::create([  // モデルを使ってレコード作成
-                // カラム名(配列のキー) => データベースに入る値(キーに対応する値)
-                // ->の右側はFakerでダミーを生成する指示
-                'user_id' => $faker->randomElement($users),
-                'comment_id' => $faker->randomElement($comments),
-            ]);
+            Like::updateOrCreate(  // updateOrCreateメソッド 指定の組み合わせがない時にレコード作成
+                [
+                    // array_rand()でランダムな要素を選択
+                    'user_id' => $users[array_rand($users)],
+                    'comment_id' => $comments[array_rand($comments)],
+                ],
+                []
+            );
         }
     }
 }
