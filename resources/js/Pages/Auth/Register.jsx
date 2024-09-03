@@ -110,7 +110,7 @@ export default function Register() {
                     </Link>
 
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        {t('Register')}
+                        {t('Confirm')}
                     </PrimaryButton>
                 </div>
             </form>
