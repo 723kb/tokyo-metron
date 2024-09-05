@@ -8,7 +8,6 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
-import Header from './Layouts/Header';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

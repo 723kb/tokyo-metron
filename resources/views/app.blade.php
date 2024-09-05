@@ -3,6 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="東京メトロ運行状況共有サービス">
+        <meta name="keywords" content="東京メトロ,運行状況,地下鉄">
+        <!-- ファビコン -->
+        <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+        <!-- アイコン -->
+        <link rel="apple-touch-icon" href="/images/apple-touch-icon-180x180.png" sizes="180x180" />
+        <link rel="apple-touch-icon" href="/images/icon-32x32.png" sizes="180x180" />
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 

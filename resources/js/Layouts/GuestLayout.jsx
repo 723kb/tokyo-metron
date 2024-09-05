@@ -2,11 +2,39 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { usePage } from "@inertiajs/react";
 import HeroSection from "@/Components/HeroSection";
-import NavigationButtons from "@/Components/NavigationButtons";
+import NavigationButton from "@/Components/NavigationButton";
 
+/**
+ * 非ログイン時のレイアウトコンポーネント
+ *
+ * @param {Object} props - コンポーネントのプロパティ
+ * @param {React.ReactNode} props.children - 子コンポーネント
+ * @returns {JSX.Element} ゲストレイアウトを含むReactコンポーネント
+ */
 export default function GuestLayout({ children }) {
-    const { url } = usePage(); // 現在のURLを取得
-    const isTopPage = url === "/"; // TOPページか判断
+    
+    /**
+     * 現在のURLを取得
+     *
+     * @type {string}
+     */
+    const { url } = usePage();
+    
+    /**
+     * TOPページか判断
+     *
+     * @type {boolean}
+     */
+    const isTopPage = url === "/"; 
+
+    /**
+    * ユーザーが認証されているかどうかを判断
+     *
+     * authオブジェクトのuserプロパティがnullでない場合 = 認証済み
+     *
+     * @type {boolean}
+     */
+    const isAuthenticated = usePage().props.auth.user !== null;
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -18,15 +46,17 @@ export default function GuestLayout({ children }) {
                         subtitle="東京メトロ運行状況共有サービス"
                         imageSrc="/images/Hero.png"
                     />
-                    <div className="w-full sm:max-w-md mx-auto px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+                    <div className="w-full sm:max-w-md mx-auto mt-10 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                         {children}
                     </div>
-                    {/* TOPページ以外ならTOPへ戻るボタンを表示 */}
-                    <NavigationButtons
-                        showBackButton={!isTopPage}
-                        isAuthenticated={false}
-                        isTopPage={isTopPage}
-                    />
+                    {/* トップページ以外でナビゲーションボタンを表示 */}
+                    {!isTopPage && (
+                        <div className="flex justify-center mt-4">
+                            <NavigationButton
+                                isAuthenticated={isAuthenticated}
+                            />
+                        </div>
+                    )}
                 </div>
             </main>
             <Footer />

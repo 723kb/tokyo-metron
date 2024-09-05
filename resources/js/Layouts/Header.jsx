@@ -7,20 +7,44 @@ import AuthLinks from "@/Components/AuthLinks";
 import MobileMenuButton from "@/Components/MobileMenuButton";
 import MobileMenu from "@/Components/MobileMenu";
 
+/**
+ * ヘッダーコンポーネント
+ *
+ * ロゴ、ナビゲーションメニュー、ユーザーメニューor認証リンクを含む。
+ * モバイル表示時にはハンバーガーメニューとなる。
+ *
+ * @returns {JSX.Element} ヘッダーコンポーネント
+ */
 const Header = () => {
-    // usePage()フックを使用して、現在のページのプロパティを取得
+    /**
+     * 現在のページのプロパティを取得
+     *
+     * @type {{auth: {user: Object|null}}}
+     */
     const { auth } = usePage().props;
-    // ユーザーが認証されているかどうかを判断
-    // auth.userがnullでない場合 = 認証済み
+
+    /**
+     * ユーザーが認証されているかどうかを判断
+     *
+     * authオブジェクトのuserプロパティがnullでない場合 = 認証済み
+     *
+     * @type {boolean}
+     */
     const isAuthenticated = auth.user !== null;
-    // モバイルメニューの開閉状態を管理
+    console.log('Header - isAuthenticated:', isAuthenticated);
+
+    /**
+     * モバイルメニューの開閉状態を管理
+     *
+     * @type {[boolean, function]} useState hook
+     */
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
         <header className="w-full bg-white shadow">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-4">
-                    <Logo />
+                    <Logo isAuthenticated={isAuthenticated} />
                     {/* デスクトップナビゲーション */}
                     <div className="hidden md:flex items-center space-x-4">
                         {/* 共通のナビゲーションメニュー */}
