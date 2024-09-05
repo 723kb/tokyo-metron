@@ -31,7 +31,6 @@ const Header = () => {
      * @type {boolean}
      */
     const isAuthenticated = auth.user !== null;
-    console.log('Header - isAuthenticated:', isAuthenticated);
 
     /**
      * モバイルメニューの開閉状態を管理
