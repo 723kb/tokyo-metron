@@ -1,6 +1,6 @@
 import GuestLayout from "@/Layouts/GuestLayout";
 import PrimaryButton from "@/Components/PrimaryButton";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
 import SecondaryButton from "@/Components/SecondaryButton";
 
@@ -17,23 +17,22 @@ import SecondaryButton from "@/Components/SecondaryButton";
  * @param {string} props.data.password_confirmation - 確認用パスワード
  * @returns {JSX.Element} 会員登録確認画面
  */
-export default function RegisterConfirm({ data: initialData }) {
-    /**
-     * フォームの状態管理
-     *
-     * @type {{
-     *   data: Object,
-     *   setData: Function,
-     *   post: Function,
-     *   processing: boolean
-     * }}
-     */
-    const { data, setData, post, processing } = useForm({
-        name: initialData.name,
-        email: initialData.email,
-        password: initialData.password,
-        password_confirmation: initialData.password_confirmation,
-    });
+export default function RegisterConfirm() {
+    // コントローラーから渡されたデータを取得
+    const { data } = usePage().props;
+
+    // データが存在しない場合のエラー処理
+    if (!data) {
+        return (
+            <GuestLayout>
+                <Head title="エラー" />
+                <div>データが見つかりません。最初からやり直してください。</div>
+                <Link href={route('register')}>会員登録画面に戻る</Link>
+            </GuestLayout>
+        );
+    }
+
+    const { post, processing } = useForm();
 
     /**
      * 修正ボタンのクリックハンドラ

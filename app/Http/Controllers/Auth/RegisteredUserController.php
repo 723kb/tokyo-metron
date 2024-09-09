@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Session;
 
 class RegisteredUserController extends Controller
 {
@@ -34,23 +35,19 @@ class RegisteredUserController extends Controller
         ]);
 
         // セッションにバリデーション済みのデータを保存
-        $request->session()->put('registration_data', $validatedData);
+        Session::put('registration_data', $validatedData);
 
         // 確認画面（Auth/RegisterConfirm）をレンダリング
         return Inertia::render('Auth/RegisterConfirm', [
-            'data' => [
-                'name' => $validatedData['name'],
-                'email' => $validatedData['email'],
-                'password' => str_repeat('*', strlen($validatedData['password'])),
-            ]
+            'data' => $validatedData
         ]);
     }
 
-    // 3. 登録処理と結果画面表示
+    // 3. 登録処理
     public function register(Request $request)
     {
         // セッションから保存したデータを取得
-        $data = $request->session()->get('registration_data');
+        $data = Session::get('registration_data', []);
 
         // データが存在しない場合は登録フォームにリダイレクト
         if (!$data) {
@@ -68,16 +65,18 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         // セッションからデータを削除
-        $request->session()->forget('registration_data');
+        Session::forget('registration_data');
 
         // 登録結果画面にリダイレクト
-        return redirect()->route('register.result')->with('user', $user);
+        Session::put('registered_user', $user);
+        return redirect()->route('register.result');
     }
 
+    // 4.結果画面表示
     public function showResult(Request $request)
     {
         // セッションからユーザー情報を取得
-        $user = $request->session()->get('user');
+        $user = Session::get('registered_user');
 
         // ユーザー情報が存在しない場合は登録画面にリダイレクト
         if (!$user) {
@@ -89,8 +88,9 @@ class RegisteredUserController extends Controller
             'data' => [
                 'name' => $user->name,
                 'email' => $user->email,
-                'password' => str_repeat('*', 8), // パスワードの長さは固定
             ]
         ]);
+        // セッションからデータを削除
+        Session::forget('registered_user');
     }
 }
