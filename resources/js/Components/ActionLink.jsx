@@ -28,7 +28,7 @@ const ActionLink = ({
     // onClickプロパティの場合、ボタンとして描画
     if (onClick) {
         return (
-            <button onClick={onClick} className={`${baseClasses} ${className}`}>
+            <button onClick={onClick} className={`${baseClasses} ${className}`} type="button">
                 {children}
             </button>
         );

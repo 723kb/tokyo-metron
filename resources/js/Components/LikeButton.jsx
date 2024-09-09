@@ -29,13 +29,8 @@ const LikeButton = ({ initialLikes, onLike }) => {
      * いいねボタンがクリックされた時の処理
      */
     const handleLike = () => {
-        if (isLiked) {
-            // すでにいいねしている場合はマイナス
-            setLikes(likes - 1);
-        } else {
-            // いいねしていない場合はプラス
-            setLikes(likes + 1);
-        }
+        // いいね数を更新（三項演算子使用）
+        setLikes(isLiked ? likes - 1 : likes + 1);
         // いいね状態を反転
         setIsLiked(!isLiked);
         // 親コンポーネントに新しいいいね状態を通知
