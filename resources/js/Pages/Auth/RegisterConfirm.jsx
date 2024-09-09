@@ -62,16 +62,6 @@ export default function RegisterConfirm({ data: initialData }) {
         post(route("register.store"));
     };
 
-    /**
-     * パスワードをマスク処理する
-     *
-     * パスワードの文字数分のアスタリスク（*）を生成し、
-     * セキュリティのためにパスワードを隠す
-     *
-     * @type {string}
-     */
-    const maskedPassword = "*".repeat(data.password?.length || 0);
-
     return (
         <GuestLayout>
             <Head title="会員登録確認" />
@@ -92,11 +82,11 @@ export default function RegisterConfirm({ data: initialData }) {
                         </div>
                         <div className="flex justify-between border-b pb-2">
                             <strong className="text-gray-700">パスワード:</strong>
-                            <span>{maskedPassword}</span>
+                            <span>非表示にしています</span>
                         </div>
                         <div className="flex justify-between border-b pb-2">
                             <strong className="text-gray-700">パスワード(確認用):</strong>
-                            <span>{maskedPassword}</span>
+                            <span>非表示にしています</span>
                         </div>
                     </div>
                     <div className="flex items-center justify-between mt-8">

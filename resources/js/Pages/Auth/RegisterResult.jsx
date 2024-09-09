@@ -11,19 +11,9 @@ export default function RegisterResult() {
     /**
      * ページプロップスから会員登録データを取得
      *
-     * @type {{name: string, email: string, password: string}}
+     * @type {{name: string, email: string}}
      */
-    const { data } = usePage().props;
-
-    /**
-     * パスワードをマスク処理する
-     *
-     * パスワードの文字数分のアスタリスク（*）を生成し、
-     * セキュリティのためにパスワードを隠す
-     *
-     * @type {string}
-     */
-    const maskedPassword = "*".repeat(data.password?.length || 0);
+    const { name,email } = usePage().props.data;
 
     return (
         <GuestLayout>
@@ -38,15 +28,15 @@ export default function RegisterResult() {
             <div className="space-y-4">
                 <div className="flex justify-between border-b pb-2">
                     <strong className="text-gray-700">名前:</strong>
-                    <span>{data.name}</span>
+                    <span>{name}</span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
                     <strong className="text-gray-700">メールアドレス:</strong>
-                    <span>{data.email}</span>
+                    <span>{email}</span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
                     <strong className="text-gray-700">パスワード:</strong>
-                    <span>{maskedPassword}</span>
+                    <span>非表示にしています</span>
                 </div>
             </div>
             <div className="mt-8 flex justify-center space-x-4">

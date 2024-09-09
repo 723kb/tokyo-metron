@@ -11,27 +11,32 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-// ゲストユーザー（未ログインユーザー）向けのルート
-Route::middleware('guest')->group(function () {
-    // 会員登録フォーム表示
-    Route::get('/register', [RegisteredUserController::class, 'showRegistrationForm'])
-        ->middleware('guest')
-        ->name('register');
+/**
+ * ゲストユーザー（未ログインユーザー）向けのルート
+ * 全体にmiddleware('guest')がかかってるから個々のルートには不要
+ */
+Route::middleware('guest')->group(function () {  // 
+    /**
+     * RegisteredUserControllerのルート
+     * 同じコントローラーを使うルートはまとめられる
+     *  */
+    Route::controller(RegisteredUserController::class)->group(function () {
+        // 会員登録フォーム表示
+        Route::get('/register', 'showRegistrationForm')
+            ->name('register');
 
-    // 会員登録確認画面表示
-    Route::post('/register/confirm', [RegisteredUserController::class, 'showConfirmForm'])
-        ->middleware('guest')
-        ->name('register.confirm');
+        // 会員登録確認画面表示
+        Route::post('/register/confirm', 'showConfirmForm')
+            ->name('register.confirm');
 
-    // 会員登録処理
-    Route::post('/register', [RegisteredUserController::class, 'register'])
-        ->middleware('guest')
-        ->name('register.store');
+        // 会員登録処理
+        Route::post('/register',  'register')
+            ->name('register.store');
 
-    // 会員登録結果画面表示
-    Route::get('/register/result', [RegisteredUserController::class, 'showResult'])
-        ->middleware('guest')
-        ->name('register.result');
+        // 会員登録結果画面表示
+        Route::get('/register/result', 'showResult')
+            ->name('register.result');
+    });
 
     // ログインフォーム表示
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
@@ -57,7 +62,9 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
-// 認証済みユーザー向けのルート
+/**
+ * 認証済みユーザー向けのルート
+ */
 Route::middleware('auth')->group(function () {
     // メール認証通知
     Route::get('verify-email', EmailVerificationPromptController::class)

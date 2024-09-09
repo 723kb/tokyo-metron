@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import GuestLayout from "@/Layouts/GuestLayout";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
@@ -6,6 +6,8 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
+import ErrorDisplay from "@/Components/ErrorDisplay";
+import FormField from "@/Components/FormField";
 
 /**
  * 会員登録フォームコンポーネント
@@ -34,6 +36,13 @@ export default function Register() {
     });
 
     /**
+     * フォーム全体のエラー表示メッセージ
+     *
+     * @type {string}
+     */
+    const [globalError, setGlobalError] = useState("");
+
+    /**
      * セッションストレージから登録データを復元する
      * 会員登録確認画面から「修正」で戻った場合に使用
      */
@@ -58,6 +67,26 @@ export default function Register() {
         };
     }, []);
 
+    // フォームエラーに応じてフォーカスを設定する
+    useEffect(() => {
+        if (errors.name) {
+            document.getElementById("name").focus();
+        } else if (errors.email) {
+            document.getElementById("email").focus();
+        } else if (errors.password) {
+            document.getElementById("password").focus();
+        } else if (errors.password_confirmation) {
+            document.getElementById("password_confirmation").focus();
+        }
+
+        // 全体エラーをチェック
+        if (Object.keys(errors).length > 0) {
+            setGlobalError("入力内容にエラーがあります。修正してください。");
+        } else {
+            setGlobalError("");
+        }
+    }, [errors]);
+
     /**
      * フォーム送信処理
      *
@@ -74,6 +103,21 @@ export default function Register() {
                     window.location.href = page.url;
                 }
             },
+            onError: () => {
+            // エラーメッセージをセット
+            setGlobalError("登録に失敗しました。以下のエラーを修正してください。");
+
+            // 各フィールドのエラーメッセージを設定
+            Object.keys(errors).forEach(field => {
+                setData(field, data[field], { error: errors[field] });
+            });
+
+            // エラーがある最初のフィールドにフォーカスを当てる
+            const firstErrorField = Object.keys(errors)[0];
+            if (firstErrorField) {
+                document.getElementById(firstErrorField)?.focus();
+            }
+            },
         });
     };
 
@@ -82,81 +126,44 @@ export default function Register() {
             <Head title={t("Register")} />
 
             <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value={t("Name")} />
+                <ErrorDisplay message={globalError} />
 
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData("name", e.target.value)}
-                        required
-                    />
+                <FormField
+                    id="name"
+                    label={t("Name")}
+                    value={data.name}
+                    onChange={(e) => setData("name", e.target.value)}
+                    error={errors.name}
+                />
 
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
+                <FormField
+                    id="email"
+                    label={t("Email")}
+                    type="email"
+                    value={data.email}
+                    onChange={(e) => setData("email", e.target.value)}
+                    error={errors.email}
+                />
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value={t("Email")} />
+                <FormField
+                    id="password"
+                    label="パスワード(半角英数8文字以上)"
+                    type="password"
+                    value={data.password}
+                    onChange={(e) => setData("password", e.target.value)}
+                    error={errors.password}
+                />
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData("email", e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value={t("Password")} />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData("password", e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value={t("Confirm Password")}
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) =>
-                            setData("password_confirmation", e.target.value)
-                        }
-                        required
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
+                <FormField
+                    id="password_confirmation"
+                    label={t("Confirm Password")}
+                    type="password"
+                    value={data.password_confirmation}
+                    onChange={(e) =>
+                        setData("password_confirmation", e.target.value)
+                    }
+                    error={errors.password_confirmation}
+                />
 
                 <div className="flex items-center justify-end mt-4">
                     <Link
