@@ -30,7 +30,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title={t('login.title')} />
+            <Head title={t('log_in')} />
 
             {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
 
