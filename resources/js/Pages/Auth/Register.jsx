@@ -104,19 +104,21 @@ export default function Register() {
                 }
             },
             onError: () => {
-            // エラーメッセージをセット
-            setGlobalError("登録に失敗しました。以下のエラーを修正してください。");
+                // エラーメッセージをセット
+                setGlobalError(
+                    "登録に失敗しました。以下のエラーを修正してください。",
+                );
 
-            // 各フィールドのエラーメッセージを設定
-            Object.keys(errors).forEach(field => {
-                setData(field, data[field], { error: errors[field] });
-            });
+                // 各フィールドのエラーメッセージを設定
+                Object.keys(errors).forEach((field) => {
+                    setData(field, data[field], { error: errors[field] });
+                });
 
-            // エラーがある最初のフィールドにフォーカスを当てる
-            const firstErrorField = Object.keys(errors)[0];
-            if (firstErrorField) {
-                document.getElementById(firstErrorField)?.focus();
-            }
+                // エラーがある最初のフィールドにフォーカスを当てる
+                const firstErrorField = Object.keys(errors)[0];
+                if (firstErrorField) {
+                    document.getElementById(firstErrorField)?.focus();
+                }
             },
         });
     };
@@ -125,59 +127,61 @@ export default function Register() {
         <GuestLayout>
             <Head title={t("Register")} />
 
-            <form onSubmit={submit}>
-                <ErrorDisplay message={globalError} />
+            <div className="w-full sm:max-w-md mx-auto mt-10 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+                <form onSubmit={submit}>
+                    <ErrorDisplay message={globalError} />
 
-                <FormField
-                    id="name"
-                    label={t("Name")}
-                    value={data.name}
-                    onChange={(e) => setData("name", e.target.value)}
-                    error={errors.name}
-                />
+                    <FormField
+                        id="name"
+                        label={t("Name")}
+                        value={data.name}
+                        onChange={(e) => setData("name", e.target.value)}
+                        error={errors.name}
+                    />
 
-                <FormField
-                    id="email"
-                    label={t("Email")}
-                    type="email"
-                    value={data.email}
-                    onChange={(e) => setData("email", e.target.value)}
-                    error={errors.email}
-                />
+                    <FormField
+                        id="email"
+                        label={t("Email")}
+                        type="email"
+                        value={data.email}
+                        onChange={(e) => setData("email", e.target.value)}
+                        error={errors.email}
+                    />
 
-                <FormField
-                    id="password"
-                    label="パスワード(半角英数8文字以上)"
-                    type="password"
-                    value={data.password}
-                    onChange={(e) => setData("password", e.target.value)}
-                    error={errors.password}
-                />
+                    <FormField
+                        id="password"
+                        label="パスワード(半角英数8文字以上)"
+                        type="password"
+                        value={data.password}
+                        onChange={(e) => setData("password", e.target.value)}
+                        error={errors.password}
+                    />
 
-                <FormField
-                    id="password_confirmation"
-                    label={t("Confirm Password")}
-                    type="password"
-                    value={data.password_confirmation}
-                    onChange={(e) =>
-                        setData("password_confirmation", e.target.value)
-                    }
-                    error={errors.password_confirmation}
-                />
+                    <FormField
+                        id="password_confirmation"
+                        label={t("Confirm Password")}
+                        type="password"
+                        value={data.password_confirmation}
+                        onChange={(e) =>
+                            setData("password_confirmation", e.target.value)
+                        }
+                        error={errors.password_confirmation}
+                    />
 
-                <div className="flex items-center justify-end mt-4">
-                    <Link
-                        href={route("login")}
-                        className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        {t("Already registered?")}
-                    </Link>
+                    <div className="flex items-center justify-end mt-4">
+                        <Link
+                            href={route("login")}
+                            className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            {t("Already registered?")}
+                        </Link>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        {t("Confirm")}
-                    </PrimaryButton>
-                </div>
-            </form>
+                        <PrimaryButton className="ms-4" disabled={processing}>
+                            {t("Confirm")}
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
         </GuestLayout>
     );
 }

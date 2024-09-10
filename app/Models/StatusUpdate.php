@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class StatusUpdate extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'line_id', 'status', 'content', 'official_flag'];
+    protected $fillable = ['line_id', 'status', 'content'];       
 
     public function user()
     {
@@ -18,5 +18,14 @@ class StatusUpdate extends Model
     public function line()
     {
         return $this->belongsTo(Line::class);
+    }
+
+    public static function fromODPTData($data, $lineId)
+    {
+        return new self([
+            'line_id' => $lineId,
+            'status' => $data['odpt:trainInformationStatus'] ?? '平常運転',
+            'content' => $data['odpt:trainInformationText'] ?? '',
+        ]);
     }
 }

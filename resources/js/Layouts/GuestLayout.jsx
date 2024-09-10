@@ -46,9 +46,9 @@ export default function GuestLayout({ children }) {
                         subtitle="東京メトロ運行状況共有サービス"
                         imageSrc="/images/Hero.png"
                     />
-                    <div className="w-full sm:max-w-md mx-auto mt-10 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+                    
                         {children}
-                    </div>
+                    
                     {/* トップページ以外でナビゲーションボタンを表示 */}
                     {!isTopPage && (
                         <div className="flex justify-center mt-4">

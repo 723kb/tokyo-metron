@@ -31,4 +31,7 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'odpt' => [
+        'key' => env('ODPT_API_KEY'),
+    ],
 ];

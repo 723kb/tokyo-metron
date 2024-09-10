@@ -1,24 +1,26 @@
 import React from 'react'
-import NavLink from "@/Components/NavLink";
 import { useTranslation } from "react-i18next";
+import { Link } from '@inertiajs/react';
 
 const AuthLinks = () => {
   const { t } = useTranslation();
+  const buttonClass = "px-4 py-2 text-white font-semibold rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2";
+
   return (
     <div className="flex items-center space-x-4">
-    <NavLink
-    href={route("login")}
-    className="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
->
-    {t("Log in")}
-</NavLink>
-<NavLink
-    href={route("register")}
-    className="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
->
-    {t("Register")}
-</NavLink>
-</div>
+      <Link 
+        href={route("login")} 
+        className={`${buttonClass} bg-blue-600 hover:bg-blue-700 focus:ring-blue-500`}
+      >
+        {t("Log in")}
+      </Link>
+      <Link 
+        href={route("register")} 
+        className={`${buttonClass} bg-green-600 hover:bg-green-700 focus:ring-green-500`}
+      >
+        {t("Register")}
+      </Link>
+    </div>
   )
 }
 

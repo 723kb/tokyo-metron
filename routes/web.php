@@ -5,6 +5,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;  // Auth ファサード
+use App\Http\Controllers\LineController;
+use App\Http\Controllers\StatusUpdateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,4 +37,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/lines-with-latest-status', [StatusUpdateController::class, 'getLinesWithLatestStatus']);
 require __DIR__.'/auth.php';
