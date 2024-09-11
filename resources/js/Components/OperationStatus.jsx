@@ -80,6 +80,7 @@ const OperationStatus = ({ onLastUpdateTime }) => {
             {lines.map((line) => (
                 <LineStatusCard
                     key={line.id}
+                    id={line.id} // 路線別投稿一覧画面に遷移するために必要
                     name={line.name}
                     lineColor={line.color_code}
                     status={line.status}

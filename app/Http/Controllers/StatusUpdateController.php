@@ -3,13 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Line;
+use App\Models\StatusUpdate;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class StatusUpdateController extends Controller
 {
+    /**
+     * 全路線の最新の運行状況を取得する
+     *
+     * @return void
+     */
     public function getLinesWithLatestStatus()
     {
+        // 各路線の最新の運行状況を取得し、必要な情報のみをマッピング
         $lines = Line::with('latestStatusUpdate')->get()->map(function ($line) {
             return [
                 'id' => $line->id,
@@ -19,11 +26,10 @@ class StatusUpdateController extends Controller
                 'content' => $line->latestStatusUpdate?->content ?? '平常運転中',
             ];
         })->values()->all(); // 配列に変換
-    
+
         //  APIとしてこのエンドポイントを呼び出すのでJSONで返す
         return response()->json($lines);
     }
-    
 
 
     /**
@@ -35,21 +41,40 @@ class StatusUpdateController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     *  新しい運行状況を保存する
      */
     public function store(Request $request)
     {
-        //
+        // リクエストデータのバリデーション
+        $validatedData = $request->validate([
+            'line_id' => 'required|exists:lines,id',
+            'status' => 'required|string',
+            'content' => 'required|string',
+        ]);
+
+        // 新しい運行状況をデータベースに保存
+        $statusUpdate = StatusUpdate::create($validatedData);
+
+        // 路線別投稿一覧画面にリダイレクト
+        return Inertia::render('LinePostList', [
+            'line' => $statusUpdate->line,
+            'latestStatus' => $statusUpdate,
+        ]);
     }
 
     /**
-     * Display the specified resource.
+     * 特定の路線の運行状況一覧を表示する
      */
-    public function show(Line $line)
+    public function show($id)
     {
-        $statusUpdates = $line->statusUpdates()->latest()->get();
+        // 指定されたIDの路線を取得
+        $line = Line::findOrFail($id);
+        // (一旦)最新10件の運行状況を取得
+        $statusUpdates = $line->statusUpdates()->latest()->take(10)->get();
 
-        return Inertia::render('StatusUpdates/Show', [
+        // 路線別投稿一覧画面を表示
+        return Inertia::render('LinePostList', [
+            'lineId' => $id,
             'line' => $line,
             'statusUpdates' => $statusUpdates
         ]);
