@@ -9,30 +9,14 @@ import { usePage } from "@inertiajs/react";
  * APIから取得した路線情報を表示
  * ログイン中はカードコンポーネントから各路線のページへ遷移できる
  *
+ * @param {function} onLastUpdateTime - 最終更新時刻を親コンポーネントに通知する関数
  * @returns {JSX.Element} 路線状況一覧を表示するコンポーネント
  */
-const OperationStatus = () => {
-    /**
-     * @type {[Array<Object>, function]} 路線情報の状態と更新関数
-     */
-    const [lines, setLines] = useState([]);
-
-    /**
-     * @type {[boolean, function]} データ読み込み中かどうかの状態と更新関数
-     */
-    const [loading, setLoading] = useState(true);
-
-    /**
-     * @type {[string|null, function]} エラー情報の状態と更新関数
-     */
-    const [error, setError] = useState(null);
-
-    /**
-     * 取得した認証情報
-     *
-     * @type {Object} 認証情報を含むオブジェクト
-     */
-    const { auth } = usePage().props;
+const OperationStatus = ({ onLastUpdateTime }) => {
+    const [lines, setLines] = useState([]); // 路線情報の状態管理
+    const [loading, setLoading] = useState(true); // ローディングの状態管理
+    const [error, setError] = useState(null); // エラー情報の状態管理
+    const { auth } = usePage().props; // 認証情報を取得
 
     /**
      * APIから路線情報を取得する非同期関数
@@ -40,26 +24,46 @@ const OperationStatus = () => {
      * APIからデータを取得し、状態を更新します。(丸ノ内線支線は除外)
      * エラーが発生した場合はエラー状態を設定します。
      */
-    useEffect(() => {
-        const fetchLines = async () => {
-            try {
-                const response = await axios.get("/lines-with-latest-status");
-                setLines(response.data);
-                // 丸ノ内線支線を除外してstateを更新
-                const filteredLines = response.data.filter(
-                    (line) => line.name !== "丸ノ内線支線",
-                );
-                setLines(filteredLines);
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching lines:", error);
-                setError("路線情報の取得に失敗しました。");
-                setLoading(false);
-            }
-        };
+    const fetchLines = async () => {
+        try {
+            // APIからデータを取得
+            const response = await axios.get("/lines-with-latest-status");
+            // 丸ノ内線支線を除外してstateを更新
+            const filteredLines = response.data.filter(
+                (line) => line.name !== "丸ノ内線支線",
+            );
+            setLines(filteredLines);
+            setLoading(false);
 
+            // 現在時刻を取得して更新時間とする
+            const lastUpdateTime = new Date().toLocaleString("ja-JP", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+            });
+
+            // 親コンポーネントに最終更新時刻を通知
+            if (typeof onLastUpdateTime === "function") {
+                onLastUpdateTime(lastUpdateTime);
+            }
+        } catch (error) {
+            console.error("Error fetching lines:", error);
+            setError("路線情報の取得に失敗しました。");
+            setLoading(false);
+        }
+    };
+
+    // コンポーネントのマウント時とその後5分ごとにデータを更新
+    useEffect(() => {
         fetchLines();
-    }, []); // 空の依存配列で、コンポーネントが初めて表示される時に1回だけ実行
+        // 5分ごとにデータを更新
+        const intervalId = setInterval(fetchLines, 5 * 60 * 1000);
+        // クリーンアップ関数：コンポーネントのアンマウント時にインターバルをクリア
+        return () => clearInterval(intervalId);
+    }, []);
 
     // ローディング中の表示
     if (loading) return <div className="text-center py-4">読み込み中...</div>;
