@@ -49,22 +49,21 @@ Route::middleware('auth')->group(function () {
 });
 
 /**
+ * 路線情報関連のルートグループ
+ */
+Route::controller(StatusUpdateController::class)->group(function () {
+    // 全路線の最新状況を取得するAPI
+    Route::get('/lines-with-latest-status', 'getLinesWithLatestStatus');
+    // 特定の路線の詳細情報を一覧表示するルート
+    Route::get('/line/{id}', 'index')->name('line.index');
+    // 特定の路線の詳細情報を個別に表示するルート
+    Route::get('/line/{lineId}/post/{postId}', 'show')->name('line.post.show');
+    // 新しい運行状況を保存するルート
+    Route::post('/status-update', 'store')->name('status-update.store');
+});
+
+/**
  * 認証関連のルート
  * （Laravel Breezeが生成）
  */
-require __DIR__.'/auth.php';
-
-/**
- * 全路線の最新状況を取得するAPI
- */
-Route::get('/lines-with-latest-status', [StatusUpdateController::class, 'getLinesWithLatestStatus']);
-
-/**
- * 特定の路線の詳細情報を表示するルート
- */
-Route::get('/line/{id}', [StatusUpdateController::class, 'show'])->name('line.show');
-
-/**
- * 新しい運行状況を保存するルート
- */
-Route::post('/status-update', [StatusUpdateController::class, 'store'])->name('status-update.store');
+require __DIR__ . '/auth.php';

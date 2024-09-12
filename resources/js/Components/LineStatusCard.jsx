@@ -58,7 +58,7 @@ const LineStatusCard = ({
     // 認証状態に応じて表示の出しわけ
     return isAuthenticated && id ? (
         <Link
-            href={route("line.show", { id: id })}
+            href={route("line.index", { id: id })}
             className={cardClasses}
             style={cardStyle}
         >

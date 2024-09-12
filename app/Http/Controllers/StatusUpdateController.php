@@ -65,18 +65,34 @@ class StatusUpdateController extends Controller
     /**
      * 特定の路線の運行状況一覧を表示する
      */
-    public function show($id)
+    public function index($id)
     {
         // 指定されたIDの路線を取得
         $line = Line::findOrFail($id);
         // (一旦)最新10件の運行状況を取得
-        $statusUpdates = $line->statusUpdates()->latest()->take(10)->get();
+        $statusUpdates = $line->statusUpdates()->withCount('comments')->latest()->take(10)->get();
 
         // 路線別投稿一覧画面を表示
         return Inertia::render('LinePostList', [
             'lineId' => $id,
             'line' => $line,
             'statusUpdates' => $statusUpdates
+        ]);
+    }
+
+    /**
+     * 特定の運行状況投稿の詳細を表示する
+     */
+    public function show($lineId, $postId)
+    {
+        $line = Line::findOrFail($lineId);
+        $statusUpdate = $line->statusUpdates()->findOrFail($postId);
+        $comments = $statusUpdate->comments()->with('user')->get();
+    
+        return Inertia::render('LinePostDetail', [
+            'line' => $line,
+            'statusUpdate' => $statusUpdate,
+            'comments' => $comments
         ]);
     }
 

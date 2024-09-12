@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import StatusDisplay from "@/Components/StatusDisplay";
 import CommentCount from "@/Components/CommentCount";
@@ -25,9 +25,13 @@ const LinePostList = ({ line, statusUpdates }) => {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         {statusUpdates.map((update) => (
-                            <div
+                            <Link
                                 key={update.id}
-                                className="mb-4 p-4 border rounded-md bg-slate-100"
+                                href={route("line.post.show", {
+                                    lineId: line.id,
+                                    postId: update.id,
+                                })}
+                                className="block mb-4 p-4 border rounded-md bg-slate-100 hover:bg-slate-200 transition duration-150 ease-in-out"
                             >
                                 <p className="text-sm text-gray-500 mb-2">
                                     {/* 更新日時 */}
@@ -39,8 +43,16 @@ const LinePostList = ({ line, statusUpdates }) => {
                                 <StatusDisplay status={update.status} />
                                 {/* 運行状況詳細 */}
                                 <p>{update.content}</p>
-                                <CommentCount />
-                            </div>
+                                <div className="flex justify-end mr-4">
+                                    {/* 
+                                        コメント数表示 
+                                        updateのプロパティとして受けとる
+                                    */}
+                                    <CommentCount
+                                        comments={update.comments_count || 0}
+                                    />
+                                </div>
+                            </Link>
                         ))}
                     </div>
                 </div>
