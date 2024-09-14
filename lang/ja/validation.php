@@ -258,4 +258,10 @@ return [
         'year' => '年',
     ],
 
+    'required' => ':attributeは必須項目です。',
+    'custom' => [
+        'content' => [
+            'required' => 'コメントを入力してください。',
+        ],
+    ],
 ];

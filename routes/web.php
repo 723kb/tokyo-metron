@@ -5,7 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;  // Auth ファサード
-use App\Http\Controllers\LineController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\StatusUpdateController;
 
 /*
@@ -46,6 +46,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    /**
+     * コメント関連のルートグループ
+     */
+    // コメント投稿ルート
+    Route::post('/line/{lineId}/post/{postId}/comments', [CommentController::class, 'store'])->name('comment.store');
+    // コメント削除ルート
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
 });
 
 /**

@@ -47,7 +47,7 @@ export default function Authenticated({ children }) {
                         <div className="flex justify-center my-4">
                             <ActionLink
                                 onClick={() => window.history.back()}
-                                className="bg-indigo-200 hover:bg-indigo-300 focus:bg-indigo-300 active:bg-indigo-400 mr-4 font-normal"
+                                className="bg-gray-800 hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-500 text-white mr-4 "
                             >
                                 戻る
                             </ActionLink>
