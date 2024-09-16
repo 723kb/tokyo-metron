@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import LineStatusCard from "@/Components/LineStatusCard";
 import { usePage } from "@inertiajs/react";
+import { format } from 'date-fns' 
+import ja from 'date-fns/locale/ja'
+
 
 /**
  * 路線の運行状況一覧を表示するコンポーネント
@@ -36,14 +39,7 @@ const OperationStatus = ({ onLastUpdateTime }) => {
             setLoading(false);
 
             // 現在時刻を取得して更新時間とする
-            const lastUpdateTime = new Date().toLocaleString("ja-JP", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-            });
+            const lastUpdateTime = format(new Date(), "yyyy/MM/dd HH:mm");
 
             // 親コンポーネントに最終更新時刻を通知
             if (typeof onLastUpdateTime === "function") {
@@ -70,9 +66,6 @@ const OperationStatus = ({ onLastUpdateTime }) => {
     // エラー時の表示
     if (error)
         return <div className="text-center py-4 text-red-500">{error}</div>;
-
-    if (loading) return <div>読み込み中...</div>;
-    if (error) return <div>{error}</div>;
 
     // 路線情報の表示
     return (
