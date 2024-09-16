@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
 import { Head } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import StatusDisplay from "@/Components/StatusDisplay";
 import LineHeroSection from "@/Components/LineHeroSection";
-import ActionLink from "@/Components/ActionLink";
-import CommentCount from "@/Components/CommentCount";
 import CommentForm from "@/Components/CommentForm";
-import CommentItem from "@/Components/CommentItem";
 import MessageAlert from "@/Components/MessageAlert";
 import StatusUpdateDetails from "@/Components/StatusUpdateDetails";
 import CommentSection from "@/Components/CommentSection";
@@ -84,6 +80,7 @@ const LinePostDetail = ({ line, statusUpdate, comments, message, auth }) => {
                             setShowCommentForm(!showCommentForm)
                         }
                         commentsCount={comments.length}
+                        showCommentForm={showCommentForm}
                     />
                     {/* showCommentFormがtrueの時にコメント入力欄を表示 */}
                     {showCommentForm && (
