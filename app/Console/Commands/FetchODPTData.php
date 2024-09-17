@@ -104,11 +104,22 @@ class FetchODPTData extends Command
         $line = Line::where('name', 'LIKE', "%{$lineName}%")->first();
         if ($line) {
           // 運行情報テキストを取得（配列の場合は日本語テキストを使用）
+          // null合体演算子を使用してキーの存在チェック
           $content = is_array($info['odpt:trainInformationText'])
             ? $info['odpt:trainInformationText']['ja'] ?? ''
             : $info['odpt:trainInformationText'] ?? '';
           // 運行状況を取得（デフォルトは'平常運転'）
-          $status = $info['odpt:trainInformationStatus'] ?? '平常運転';
+          $status = '平常運転';
+          if (isset($info['odpt:trainInformationStatus'])) {
+            // 'odpt:trainInformationStatus'キーが存在する場合のみ処理
+            $status = is_array($info['odpt:trainInformationStatus'])
+              ? ($info['odpt:trainInformationStatus']['ja'] ?? '平常運転')
+              : $info['odpt:trainInformationStatus'];
+          }
+
+          // デバッグ情報の出力
+          $this->info("Raw status data: " . print_r($info['odpt:trainInformationStatus'] ?? 'Not set', true));
+          $this->info("Processed status: $status");
 
           // 最新の状態更新を取得
           $latestUpdate = StatusUpdate::where('line_id', $line->id)
@@ -132,7 +143,9 @@ class FetchODPTData extends Command
       } catch (\Exception $e) {
         // エラーログを記録
         $this->error("Error processing train information for $lineName: " . $e->getMessage());
+        $this->error("Raw data: " . print_r($info, true));
         Log::error("Error processing train information for $lineName: " . $e->getMessage());
+        Log::error("Raw data: " . print_r($info, true));
       }
     }
   }
