@@ -1,5 +1,5 @@
-import Header from "./Header";
-import Footer from "./Footer";
+import Header from "@/Layouts/Header";
+import Footer from "@/Layouts/Footer";
 import { usePage } from "@inertiajs/react";
 import HeroSection from "@/Components/HeroSection";
 import NavigationButton from "@/Components/NavigationButton";

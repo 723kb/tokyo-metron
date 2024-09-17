@@ -1,9 +1,8 @@
 import { usePage } from "@inertiajs/react";
-import Header from "./Header";
-import Footer from "./Footer";
+import Header from "@/Layouts/Header";
+import Footer from "@/Layouts/Footer"
 import HeroSection from "@/Components/HeroSection";
 import NavigationButton from "@/Components/NavigationButton";
-import SecondaryButton from "@/Components/SecondaryButton";
 import ActionLink from "@/Components/ActionLink";
 
 /**
