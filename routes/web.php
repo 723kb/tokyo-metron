@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;  // Auth ファサード
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\StatusUpdateController;
+use App\Http\Controllers\LikeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,10 +51,24 @@ Route::middleware('auth')->group(function () {
     /**
      * コメント関連のルートグループ
      */
-    // コメント投稿ルート
-    Route::post('/line/{lineId}/post/{postId}/comments', [CommentController::class, 'store'])->name('comment.store');
-    // コメント削除ルート
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
+    Route::controller(CommentController::class)->group(function () {
+        // コメント投稿ルート
+        Route::post('/line/{lineId}/post/{postId}/comments', 'store')->name('comment.store');
+        // コメント削除ルート
+        Route::delete('/comments/{comment}', 'destroy')->name('comment.destroy');
+    });
+
+    /**
+     * いいね関連のルートグループ
+     */
+    Route::controller(LikeController::class)->group(function () {
+        // コメントにいいねを追加するルート
+        Route::post('/comments/{comment}/like', 'store');
+        // コメントのいいねを削除するルート
+        Route::delete('/comments/{comment}/like', 'destroy');
+        // コメントのいいね状態を取得するルート
+        Route::get('/comments/{comment}/like-status', 'getStatus');
+    });
 });
 
 /**

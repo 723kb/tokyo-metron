@@ -2,6 +2,7 @@ import React from "react";
 import { useForm } from "@inertiajs/react";
 import TrashIcon from "./TrashIcon";
 import ActionLink from "@/Components/ActionLink";
+import LikeButton from "./LikeButton";
 
 /**
  * 個別のコメントを表示するコンポーネント
@@ -14,6 +15,7 @@ import ActionLink from "@/Components/ActionLink";
  * @param {string} props.comment.user.name - 投稿者名
  * @param {string} props.comment.created_at - コメント投稿日時
  * @param {number} props.currentUserId - 現在ログインしているユーザーのID
+ * @param {number} props.comment.likes_count - いいね数
  * @param {Function} props.onCommentDeleted - コメント削除時のコールバック関数
  * @returns {JSX.Element} コメント表示コンポーネント
  */
@@ -47,16 +49,25 @@ const CommentItem = ({ comment, currentUserId, onCommentDeleted }) => {
             <div className="flex justify-between items-center text-sm text-gray-500">
                 {/* コメント投稿日時 */}
                 <p>{new Date(comment.created_at).toLocaleString()}</p>
-                {/* 現在ログインしているユーザーがコメント投稿者の時に削除ボタンを表示 */}
-                {currentUserId === comment.user_id && (
-                    <ActionLink
-                        onClick={handleDelete}
-                        className="text-red-500 hover:text-black focus:outline-none p-1 bg-transparent hover:bg-transparent"
-                        title="削除"
-                    >
-                        <TrashIcon />
-                    </ActionLink>
-                )}
+                <div className="flex">
+                    {/* 現在ログインしているユーザーがコメント投稿者の時に削除ボタンを表示 */}
+                    {currentUserId === comment.user_id && (
+                        <ActionLink
+                            onClick={handleDelete}
+                            className="text-red-500 hover:text-black focus:outline-none p-1 bg-transparent hover:bg-transparent"
+                            title="削除"
+                        >
+                            <TrashIcon />
+                        </ActionLink>
+                    )}
+                    {/* いいねボタン */}
+                    <LikeButton
+                        commentId={comment.id}
+                        initialLikes={comment.likes_count}
+                        // 現在のユーザーが特定のコメントに「いいね」をしているかどうか
+                        initialIsLiked={comment.is_liked_by_user}
+                    />
+                </div>
             </div>
         </div>
     );
