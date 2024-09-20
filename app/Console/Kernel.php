@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
      */    
     protected $commands = [
         \App\Console\Commands\FetchODPTData::class,  // ODPTデータ取得コマンドを登録
+        \App\Console\Commands\DeleteOldStatuses::class,  // 古い運行状況を削除するコマンドを登録
     ];
 
     /**
@@ -30,6 +31,8 @@ class Kernel extends ConsoleKernel
     {
          // ODPTデータ取得コマンドを5分ごとに実行するようスケジュール
         $schedule->command('odpt:fetch')->everyFiveMinutes();
+        // 古い運行状況を削除するコマンドを毎日実行するようスケジュール
+        $schedule->command('app:delete-old-statuses')->daily();  
     }
 
     /**

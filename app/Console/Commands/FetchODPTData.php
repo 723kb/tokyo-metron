@@ -14,14 +14,14 @@ use Illuminate\Support\Facades\Log;
 class FetchODPTData extends Command
 {
   /**
-   * コマンドの名前と説明
+   * コマンドの名前と引数を定義
    *
    * @var string
    */
   protected $signature = 'odpt:fetch';
 
   /**
-   * コマンドの名前と説明
+   * コマンドの説明
    *
    * @var string
    */
