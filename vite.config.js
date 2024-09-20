@@ -10,11 +10,7 @@ export default defineConfig({
             refresh: true,
         }),
         react(),
-        basicSsl()
     ],
-    server: {
-        https: true,
-    },
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./resources/js"), // エイリアスの作成
