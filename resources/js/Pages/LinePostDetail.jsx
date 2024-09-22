@@ -45,9 +45,12 @@ const LinePostDetail = ({ line, statusUpdate, comments, message, auth }) => {
         setMessageType("success");
     };
 
+    /** 
+     * コメント削除時のハンドラー
+     */
     const handleCommentDeleted = () => {
         setLocalMessage("コメントを削除しました！");
-        setMessageType("error");
+        setMessageType("info");
     };
 
     // 必要なデータが存在しない場合のエラー表示

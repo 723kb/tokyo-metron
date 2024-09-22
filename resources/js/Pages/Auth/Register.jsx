@@ -134,6 +134,7 @@ export default function Register() {
                         value={data.name}
                         onChange={(e) => setData("name", e.target.value)}
                         error={errors.name}
+                        placeholder="めとろん"
                     />
 
                     <FormField
@@ -143,6 +144,7 @@ export default function Register() {
                         value={data.email}
                         onChange={(e) => setData("email", e.target.value)}
                         error={errors.email}
+                        placeholder="example@example.com"
                     />
 
                     <FormField
@@ -152,6 +154,7 @@ export default function Register() {
                         value={data.password}
                         onChange={(e) => setData("password", e.target.value)}
                         error={errors.password}
+                        placeholder="Password123"
                     />
 
                     <FormField
@@ -163,6 +166,7 @@ export default function Register() {
                             setData("password_confirmation", e.target.value)
                         }
                         error={errors.password_confirmation}
+                        placeholder="Password123"
                     />
 
                     <div className="flex items-center justify-end mt-4">

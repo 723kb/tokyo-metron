@@ -35,9 +35,7 @@ const LikeButton = ({
         // likes テーブルの最新状態を取得
         const fetchLikeStatus = async () => {
             try {
-                const response = await axios.get(
-                    `/comments/${commentId}/like-status`,
-                );
+                const response = await axios.get(route('comments.like.status', commentId));
                 // 取得した情報でいいねの状態を更新
                 setIsLiked(response.data.is_liked);
                 setLikes(response.data.likes_count);
@@ -64,7 +62,7 @@ const LikeButton = ({
         try {
             // サーバーにいいねの状態を送信
             const response = await axios[isLiked ? "delete" : "post"](
-                `/comments/${commentId}/like`,
+                route(isLiked ? 'comments.like.destroy' : 'comments.like.store', commentId)
             );
             // サーバーからの応答で状態を更新
             setIsLiked(response.data.is_liked);

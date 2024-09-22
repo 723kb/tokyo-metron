@@ -256,6 +256,7 @@ return [
         'updated_at' => '更新日',
         'username' => 'ユーザー名',
         'year' => '年',
+        'selectedLines' => 'お気に入り路線',
     ],
 
     'required' => ':attributeは必須項目です。',
