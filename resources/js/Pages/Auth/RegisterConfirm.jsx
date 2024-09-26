@@ -27,7 +27,7 @@ export default function RegisterConfirm() {
             <GuestLayout>
                 <Head title="エラー" />
                 <div>データが見つかりません。最初からやり直してください。</div>
-                <Link href={route('register')}>会員登録画面に戻る</Link>
+                <Link href={route("register")}>会員登録画面に戻る</Link>
             </GuestLayout>
         );
     }
@@ -65,7 +65,10 @@ export default function RegisterConfirm() {
         <GuestLayout>
             <Head title="会員登録確認" />
 
-                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">会員登録確認</h2>
+            <div className="w-full sm:max-w-md mx-auto mt-10 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                    会員登録確認
+                </h2>
                 <div className="mb-6 text-sm text-gray-600 text-center">
                     以下の内容で登録します。
                 </div>
@@ -76,24 +79,34 @@ export default function RegisterConfirm() {
                             <span>{data.name}</span>
                         </div>
                         <div className="flex justify-between border-b pb-2">
-                            <strong className="text-gray-700">メールアドレス:</strong>
+                            <strong className="text-gray-700">
+                                メールアドレス:
+                            </strong>
                             <span>{data.email}</span>
                         </div>
                         <div className="flex justify-between border-b pb-2">
-                            <strong className="text-gray-700">パスワード:</strong>
+                            <strong className="text-gray-700">
+                                パスワード:
+                            </strong>
                             <span>非表示にしています</span>
                         </div>
                         <div className="flex justify-between border-b pb-2">
-                            <strong className="text-gray-700">パスワード(確認用):</strong>
+                            <strong className="text-gray-700">
+                                パスワード(確認用):
+                            </strong>
                             <span>非表示にしています</span>
                         </div>
                     </div>
                     <div className="flex items-center justify-between mt-8">
-                        <SecondaryButton onClick={handleEdit} type="button">修正</SecondaryButton>
-                        <PrimaryButton disabled={processing}>登録</PrimaryButton>
+                        <SecondaryButton onClick={handleEdit} type="button">
+                            修正
+                        </SecondaryButton>
+                        <PrimaryButton disabled={processing}>
+                            登録
+                        </PrimaryButton>
                     </div>
                 </form>
-
+            </div>
         </GuestLayout>
     );
 }

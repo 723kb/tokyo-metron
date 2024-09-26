@@ -3,6 +3,8 @@ import Header from "./Header";
 import Footer from "./Footer";
 import HeroSection from "@/Components/HeroSection";
 import NavigationButton from "@/Components/NavigationButton";
+import SecondaryButton from "@/Components/SecondaryButton";
+import ActionLink from "@/Components/ActionLink";
 
 /**
  * ログイン時のレイアウトコンポーネント
@@ -24,7 +26,7 @@ export default function Authenticated({ children }) {
      *
      * @type {boolean}
      */
-    const isMainPage = url === "/main";
+    const isMainPage = url === "/main" || url === "/";
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -40,9 +42,15 @@ export default function Authenticated({ children }) {
                         />
                     )}
                     {children}
-                    {/* メインページ以外で「メインに戻る」ボタンを表示 */}
+                    {/* メインページ以外で「戻る」「メインに戻る」ボタンを表示 */}
                     {!isMainPage && (
-                        <div className="flex justify-center mt-4">
+                        <div className="flex justify-center my-4">
+                            <ActionLink
+                                onClick={() => window.history.back()}
+                                className="bg-indigo-200 hover:bg-indigo-300 focus:bg-indigo-300 active:bg-indigo-400 mr-4 font-normal"
+                            >
+                                戻る
+                            </ActionLink>
                             <NavigationButton isAuthenticated={true} />
                         </div>
                     )}

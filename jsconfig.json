@@ -3,8 +3,10 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["resources/js/*"],
-            "ziggy-js": ["./vendor/tightenco/ziggy"]
+            "ziggy-js": ["./vendor/tightenco/ziggy"],
+            "@/components/*": ["resources/js/Components/*"],
+            "@/Layouts/*": ["resources/js/Layouts/*"] // ショートカットの指定
         }
     },
-    "exclude": ["node_modules", "public"]
+    "include": ["resources/**/*"]
 }

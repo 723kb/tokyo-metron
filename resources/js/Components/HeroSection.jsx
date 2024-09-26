@@ -1,10 +1,13 @@
 import React from "react";
 
 const HeroSection = ({ title, subtitle, imageSrc }) => {
+        // 環境変数を使用して画像のフルパスを生成
+        const fullImageSrc = `${import.meta.env.VITE_APP_URL}${imageSrc}`;
+
     return (
         <div className="relative h-[500px]">
             <img
-                src={imageSrc}
+                src={fullImageSrc}
                 alt="ヒーロー画像"
                 className="absolute inset-0 w-full h-full object-cover"
             />

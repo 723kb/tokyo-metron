@@ -12,11 +12,14 @@ import { Link } from "@inertiajs/react";
  * @returns {JSX.Element} ロゴとサイト名を含むヘッダー部分
  */
 const Logo = ({ isAuthenticated }) => {
+    // 環境変数を使用して画像のフルパスを生成
+    const logoSrc = `${import.meta.env.VITE_APP_URL}/images/HeaderLogo.png`;
+
     return (
         <div className="flex items-center">
             <Link href={isAuthenticated ? route("main") : route("top")}>
                 <img
-                    src="/images/HeaderLogo.png"
+                    src={logoSrc}
                     alt="トーキョーめとろんロゴ"
                     className="w-[100px] mr-2"
                 />

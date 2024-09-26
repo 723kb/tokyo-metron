@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Line;
-
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class LineController extends Controller
@@ -13,7 +13,7 @@ class LineController extends Controller
     public function index()
     {
         $lines = Line::all();
-        return view('lines.index', compact('lines'));
+        return Inertia::render('Lines/Index', ['lines' => $lines]);
     }
 
     /**
@@ -37,7 +37,8 @@ class LineController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $line = Line::findOrFail($id);
+    return Inertia::render('Lines/Show', ['line' => $line]);
     }
 
     /**
