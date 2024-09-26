@@ -33,7 +33,7 @@ const MyPage = () => {
                             </li>
                             <li>
                                 <Link
-                                    href="#"
+                                    href={route("notification-settings.show")}
                                     className="hover:text-slate-600 hover:underline"
                                 >
                                     通知設定

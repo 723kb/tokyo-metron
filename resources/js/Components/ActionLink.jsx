@@ -23,14 +23,14 @@ const ActionLink = ({
     preserveState = true,
 }) => {
     const baseClasses =
-        "inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md uppercase tracking-widest hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150";
+    "inline-flex items-center px-4 py-2 border border-transparent rounded-md uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150";
 
     // onClickプロパティの場合、ボタンとして描画
     if (onClick) {
         return (
             <button
                 onClick={onClick}
-                className={`${baseClasses} ${className}`}
+                className={`${baseClasses} ${className || 'bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600 active:bg-blue-700'}`}
                 type="button"
             >
                 {children}
@@ -42,7 +42,7 @@ const ActionLink = ({
     return (
         <Link
             href={href}
-            className={`${baseClasses} ${className}`}
+            className={`${baseClasses} ${className || 'bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600 active:bg-blue-700'}`}
             preserveState={preserveState}
         >
             {children}

@@ -78,7 +78,7 @@ Route::middleware('auth')->group(function () {
     })->where('comment', '[0-9]+');  // {comment} パラメータが数字のみであることを保証
 
     /**
-     * お気に入りページへのルートグループ
+     * お気に入りページ/通知設定へのルートグループ
      */
     Route::controller(UserLineSettingController::class)->group(function () {
         // お気に入り一覧ページを表示
@@ -93,6 +93,11 @@ Route::middleware('auth')->group(function () {
         Route::put('/favorites', 'update')->name('favorites.update');
         // 指定されたIDのお気に入りを削除
         Route::delete('/favorites/{id}', 'destroy')->name('favorites.destroy');
+
+        // 通知設定を表示
+        Route::get('notification-settings', 'showNotificationSettings')->name('notification-settings.show');
+        // 通知設定を保存(更新)
+        Route::patch('notification-settings', 'updateNotificationSettings')->name('notification-settings.update');
     });
 });
 

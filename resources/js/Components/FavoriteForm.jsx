@@ -73,6 +73,7 @@ const FavoriteForm = ({
                         value={data.selectedLines.includes(line.id)}
                         onChange={() => handleCheckboxChange(line.id)}
                         style={{ backgroundColor: line.color_code }}
+                        isFavoritePage={true}
                     />
                 ))}
                 {/* バリデーションエラーがある場合に表示 */}
