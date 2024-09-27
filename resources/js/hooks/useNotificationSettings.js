@@ -1,5 +1,5 @@
 import { useForm } from "@inertiajs/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 /**
  * 通知設定を管理するカスタムフック
@@ -20,6 +20,13 @@ export const useNotificationSettings = (initialUserLineSettings) => {
      * 変更されたかどうかを追跡するフラグとその更新関数
      */
     const [isChanged, setIsChanged] = useState(false);
+
+    /**
+     * フォーム送信中かどうかを追跡するフラグとその更新関数
+     *
+     * これがないと保存を促すメッセージがいつまでも表示される
+     */
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     /**
      * useFormフックを使用してフォームの状態を管理
@@ -51,25 +58,31 @@ export const useNotificationSettings = (initialUserLineSettings) => {
      * @param {string} field - 変更するフィールド名
      * @param {any} value - 新しい値
      */
-    const handleChange = (index, field, value) => {
-        const updatedSettings = [...data.userLineSettings];
-        updatedSettings[index][field] = value;
-        setData("userLineSettings", updatedSettings);
-        setIsChanged(true); // 変更があった場合にフラグを立てる
-    };
+    const handleChange = useCallback(
+        (index, field, value) => {
+            const updatedSettings = [...data.userLineSettings];
+            updatedSettings[index][field] = value;
+            setData("userLineSettings", updatedSettings);
+            setIsChanged(true); // 変更があった場合にフラグを立てる
+        },
+        [data, setData],
+    );
 
     /**
      * 通知のオン/オフを切り替えるハンドラー
      *
      * @param {number} index - 切り替える設定の配列内のインデックス
      */
-    const handleToggle = (index) => {
-        const updatedSettings = [...data.userLineSettings];
-        updatedSettings[index].notify_status_flag =
-            !updatedSettings[index].notify_status_flag;
-        setData("userLineSettings", updatedSettings);
-        setIsChanged(true); // トグル変更時もフラグを立てる
-    };
+    const handleToggle = useCallback(
+        (index) => {
+            const updatedSettings = [...data.userLineSettings];
+            updatedSettings[index].notify_status_flag =
+                !updatedSettings[index].notify_status_flag;
+            setData("userLineSettings", updatedSettings);
+            setIsChanged(true); // トグル変更時もフラグを立てる
+        },
+        [data, setData],
+    );
 
     /**
      * フォーム送信を処理するハンドラー
@@ -78,62 +91,69 @@ export const useNotificationSettings = (initialUserLineSettings) => {
      *
      * @param {Event} e - フォーム送信イベント
      */
-    const handleSubmit = (e) => {
-        console.log("handleSubmit called");
-        e.preventDefault();
+    const handleSubmit = useCallback(
+        async (e) => {
+            e.preventDefault();
+            setIsSubmitting(true);
 
-        // 通知設定のバリデーションチェック
-        const isValid = data.userLineSettings.every((setting) => {
-            // 通知が無効の場合は、他のチェックをスキップ
-            if (!setting.notify_status_flag) return true;
+            // 通知設定のバリデーションチェック
+            const isValid = data.userLineSettings.every((setting) => {
+                // 通知が無効の場合は、他のチェックをスキップ
+                if (!setting.notify_status_flag) return true;
 
-            // 少なくとも1つの曜日が選択されているかチェック
-            const hasSelectedDay =
-                setting.notify_monday ||
-                setting.notify_tuesday ||
-                setting.notify_wednesday ||
-                setting.notify_thursday ||
-                setting.notify_friday ||
-                setting.notify_saturday ||
-                setting.notify_sunday;
+                // 少なくとも1つの曜日が選択されているかチェック
+                const hasSelectedDay =
+                    setting.notify_monday ||
+                    setting.notify_tuesday ||
+                    setting.notify_wednesday ||
+                    setting.notify_thursday ||
+                    setting.notify_friday ||
+                    setting.notify_saturday ||
+                    setting.notify_sunday;
 
-            // 開始時間と終了時間の両方が設定されているかチェック
-            const hasStartAndEndTime =
-                setting.notify_start_time && setting.notify_end_time;
-            // 必須通知時刻が設定されているかチェック
-            const hasFixedTime = setting.notify_fixed_time;
+                // 開始時間と終了時間の両方が設定されているかチェック
+                const hasStartAndEndTime =
+                    setting.notify_start_time && setting.notify_end_time;
+                // 必須通知時刻が設定されているかチェック
+                const hasFixedTime = setting.notify_fixed_time;
 
-            // 曜日が選択されており、かつ（開始・終了時間の両方 または 必須通知時刻）が設定されているかチェック
-            return hasSelectedDay && (hasStartAndEndTime || hasFixedTime);
-        });
-
-        // バリデーションエラーの場合、アラートを表示して処理を中断
-        if (!isValid) {
-            setMessage({
-                text: "通知を有効にする場合は必ず曜日を選択し、開始時間と終了時間または必須通知時刻を入力してください。",
-                type: "error",
+                // 曜日が選択されており、かつ（開始・終了時間の両方 または 必須通知時刻）が設定されているかチェック
+                return hasSelectedDay && (hasStartAndEndTime || hasFixedTime);
             });
-            return;
-        }
 
-        // patchメソッドを使用してサーバーに更新リクエストを送信
-        patch(route("notification-settings.update"), data, {
-            preserveState: true,
-            preserveScroll: true,
-            onSuccess: (page) => {
-                setMessage({ text: page.props.message, type: "success" });
-                setData("userLineSettings", page.props.userLineSettings);
-                setIsChanged(false); // 保存成功後にフラグをリセット
-            },
-            onError: (errors) => {
-                console.error("Error updating settings:", errors);
+            // バリデーションエラーの場合、アラートを表示して処理を中断
+            if (!isValid) {
                 setMessage({
-                    text: "設定の更新中にエラーが発生しました。",
+                    text: "通知を有効にする場合は必ず曜日を選択し、開始時間と終了時間または必須通知時刻を入力してください。",
                     type: "error",
                 });
-            },
-        });
-    };
+                setIsSubmitting(false);
+                return;
+            }
+
+            // patchメソッドを使用してサーバーに更新リクエストを送信
+            patch(route("notification-settings.update"), data, {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    setIsChanged(false); // 保存成功後にフラグをリセット
+                    setMessage({ text: page.props.message, type: "success" });
+                    setData("userLineSettings", page.props.userLineSettings);
+                },
+                onError: (errors) => {
+                    console.error("Error updating settings:", errors);
+                    setMessage({
+                        text: "設定の更新中にエラーが発生しました。",
+                        type: "error",
+                    });
+                },
+                onFinish: () => {
+                    setIsSubmitting(false);
+                },
+            });
+        },
+        [data, patch, setData],
+    );
 
     return {
         data,         // フォームデータ
@@ -141,6 +161,7 @@ export const useNotificationSettings = (initialUserLineSettings) => {
         message,      // 現在のメッセージ
         setMessage,   // メッセージを設定する関数
         isChanged,    // 変更を追跡
+        isSubmitting, // フォーム送信中かどうかのフラグ
         errors,       // バリデーションエラー
         handleChange, // 個別設定変更ハンドラー
         handleToggle, // 通知オン/オフ切り替えハンドラー

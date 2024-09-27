@@ -9,6 +9,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\StatusUpdateController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\UserLineSettingController;
+use App\Http\Controllers\LineNotifyTokenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,6 +99,14 @@ Route::middleware('auth')->group(function () {
         Route::get('notification-settings', 'showNotificationSettings')->name('notification-settings.show');
         // 通知設定を保存(更新)
         Route::patch('notification-settings', 'updateNotificationSettings')->name('notification-settings.update');
+    });
+
+    // LINE Notifyとの連携ルート
+    Route::controller(LineNotifyTokenController::class)->group(function () {
+        // コールバック処理
+        Route::get('line-notify/callback', 'handleCallback')->name('line-notify.callback');
+        // 連携解除
+        Route::post('line-notify/disconnect', 'disconnect')->name('line-notify.disconnect');
     });
 });
 

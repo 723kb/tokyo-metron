@@ -20,7 +20,7 @@ const LineNotificationSetting = ({
     handleToggle,
 }) => {
     return (
-        <div key={setting.id} className="mb-4 p-4 border rounded">
+        <div key={setting.id} className="mb-4 p-4 border-b rounded">
             {/* 路線名を表示 */}
             <h2 className="text-xl font-semibold mb-2">{setting.line.name}</h2>
 

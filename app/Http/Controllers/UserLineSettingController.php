@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use App\Services\UserLineSettingService;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class UserLineSettingController extends Controller
 {
-    // サービスファイルに分けたものを使うので記載
+    // UserLineSettingServiceのインスタンスを保持(サービスファイルに分けたものを使うので記載)
     protected $service;
 
     public function __construct(UserLineSettingService $service)
@@ -123,12 +125,32 @@ class UserLineSettingController extends Controller
      */
     public function showNotificationSettings()
     {
+        $user = Auth::user();
+
         // サービスを使用してユーザーの路線設定を取得
         $userLineSettings = $this->service->getFavoriteLineSettings();
 
+        // LINE Notify連携状態を確認
+        $isLineConnected = $user->lineNotifyToken()->exists();
+
+        // LINE Notify用のstateパラメータを生成
+        $state = Str::random(40);  // 40文字のランダムな文字列を生成
+        session(['line_notify_state' => $state]);  // $state(CSRF攻撃を防ぐために使用)をセッションに保存し、後でコールバック時に検証
+
+        // LINE Notify認証URLの生成
+        $lineConnectUrl = 'https://notify-bot.line.me/oauth/authorize?' . http_build_query([  // 配列をクエリ文字列に変換
+            'response_type' => 'code',  // OAuth2.0の認証コードフローを使用
+            'client_id' => config('services.line_notify.client_id'),  //  LINE Notifyで取得したクライアントID
+            'redirect_uri' => route('line-notify.callback'),  // 認証後にリダイレクトされる URL
+            'scope' => 'notify',  //  LINE Notify の通知権限を要求
+            'state' => $state  // 生成したランダムな文字列
+        ]);
+
         // NotificationSettingsコンポーネントをレンダリング
         return Inertia::render('NotificationSettings', [
-            'userLineSettings' => $userLineSettings
+            'userLineSettings' => $userLineSettings,
+            'lineConnectUrl' => $lineConnectUrl,
+            'isLineConnected' => $isLineConnected,
         ]);
     }
 
