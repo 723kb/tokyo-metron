@@ -167,20 +167,20 @@ class UserLineSettingController extends Controller
             // サービスを使用して通知設定を更新
             $this->service->updateNotificationSettings($validatedData['userLineSettings']);
 
-            $message = '通知設定を更新しました。';  // 成功メッセージ
+            // 最新のユーザー設定を取得
+            $userLineSettings = $this->service->getFavoriteLineSettings();
+
+            return  Inertia::render('NotificationSettings', [
+                'userLineSettings' => $userLineSettings,
+                'flashMessage' => '通知設定を更新しました。'
+            ]);
         } catch (\Exception $e) {
             // エラーをログに記録
             Log::error('Error updating settings: ' . $e->getMessage());
-            $message = 'エラーが発生しました。';  // エラーメッセージ
+            return Inertia::render('NotificationSettings', [
+                'userLineSettings' => $this->service->getFavoriteLineSettings(),
+                'flashMessage' => 'エラーが発生しました。'
+            ])->with('errors', [$e->getMessage()]);
         }
-
-        // 最新のユーザー設定を取得（成功時もエラー時も共通）
-        $userLineSettings = $this->service->getFavoriteLineSettings();
-
-        // NotificationSettingsコンポーネントをレンダリング
-        return Inertia::render('NotificationSettings', [
-            'userLineSettings' => $userLineSettings,
-            'message' => $message
-        ]);
     }
 }
