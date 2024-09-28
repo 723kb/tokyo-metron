@@ -8,6 +8,8 @@ use App\Services\LineNotifyService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
+use App\Models\UserLineSetting;
 
 class LineNotifyTokenController extends Controller
 {
@@ -31,10 +33,10 @@ class LineNotifyTokenController extends Controller
         // コールバックリクエストの内容をログに記録
         Log::info('LINE Notify callback received', $request->all());
 
-        /* 
-        リクエストから認証コードとステートを取得
-        codeはアクセストークンを取得するために使用、stateはCSRF対策に使用
-        */
+        /**
+         * リクエストから認証コードとステートを取得
+         * codeはアクセストークンを取得するために使用、stateはCSRF対策に使用
+         */
         $code = $request->input('code');
         $state = $request->input('state');
 
@@ -56,10 +58,11 @@ class LineNotifyTokenController extends Controller
             if ($accessToken) {
                 $user = Auth::user();
                 if ($user) {
-                    /* 
-                    ユーザーとLINE Notifyトークンを関連付けて保存または更新
-                    updateOrCreate メソッドを使用して、既存のレコードがあれば更新、なければ新規作成
-                    */
+
+                    /**
+                     * ユーザーとLINE Notifyトークンを関連付けて保存または更新
+                     * updateOrCreate メソッドを使用して、既存のレコードがあれば更新、なければ新規作成
+                     */
                     LineNotifyToken::updateOrCreate(
                         ['user_id' => $user->id],  // 検索条件
                         ['token' => $accessToken]  // 更新または作成するデータ
@@ -100,10 +103,10 @@ class LineNotifyTokenController extends Controller
         if ($lineNotifyToken) {
             try {
 
-                /* 
-                LINE Notify APIを呼び出してトークンを無効化
-                Http::withToken()メソッドを使用して、認証トークンをヘッダーに設定
-                */
+                /**
+                 * LINE Notify APIを呼び出してトークンを無効化
+                 * Http::withToken()メソッドを使用して、認証トークンをヘッダーに設定
+                 */
                 $response = Http::withToken($lineNotifyToken->token)
                     ->post('https://notify-api.line.me/api/revoke');
 
@@ -136,18 +139,54 @@ class LineNotifyTokenController extends Controller
     /**
      * 特定のユーザーにLINE通知を送信するメソッド
      *
-     * @param int $userId
-     * @param string $message
-     * @return string
+     * @param int $userId ユーザーID
+     * @param string $message 送信するメッセージ
+     * @param int $lineId 路線ID
+     * @return string 処理結果のメッセージ
      */
-    public function sendNotification($userId, $message)
+    public function sendNotification($userId, $message, $lineId)
     {
         // ユーザーのLINE Notifyトークンを取得
         $lineNotifyToken = LineNotifyToken::where('user_id', $userId)->first();
 
+        // トークンが存在しない場合、警告をログに記録して処理を中断
         if (!$lineNotifyToken) {
             Log::warning('Attempted to send notification to user without LINE Notify token', ['user_id' => $userId]);
             return 'User not found or LINE Notify not connected';
+        }
+
+        // ユーザーの通知設定を取得
+        $userSetting = UserLineSetting::where('user_id', $userId)
+            ->where('line_id', $lineId)
+            ->first();
+
+        // 通知設定が無効の場合、処理を中断
+        if (!$userSetting || !$userSetting->notify_status_flag) {
+            Log::info('Notification skipped due to user settings', ['user_id' => $userId, 'line_id' => $lineId]);
+            return 'Notification skipped due to user settings';
+        }
+
+        $now = Carbon::now();
+        $dayOfWeek = strtolower($now->englishDayOfWeek);
+        $currentTime = $now->format('H:i:s');
+
+        // 曜日と時間の条件をチェック
+        $dayField = "notify_$dayOfWeek";
+        if (!$userSetting->$dayField) {
+            Log::info('Notification skipped due to day of week setting', ['user_id' => $userId, 'day' => $dayOfWeek]);
+            return 'Notification skipped due to day of week setting';
+        }
+
+        // 開始時間と終了時間の設定をチェック
+        if ($userSetting->notify_start_time && $userSetting->notify_end_time) {
+            if ($currentTime < $userSetting->notify_start_time || $currentTime > $userSetting->notify_end_time) {
+                Log::info('Notification skipped due to time range setting', ['user_id' => $userId, 'current_time' => $currentTime]);
+                return 'Notification skipped due to time range setting';
+            }
+            // 必須通知時刻の設定をチェック
+        } elseif ($userSetting->notify_fixed_time && $currentTime != $userSetting->notify_fixed_time) {
+            Log::info('Notification skipped due to fixed time setting', ['user_id' => $userId, 'current_time' => $currentTime]);
+            return 'Notification skipped due to fixed time setting';
         }
 
         try {

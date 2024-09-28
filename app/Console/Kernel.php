@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Jobs\SendFixedTimeNotifications;
+use App\Jobs\CheckStatusUpdatesAndNotify;
 
 /**
  * アプリケーションのコンソールコマンドとスケジューリングを管理
@@ -33,6 +35,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('odpt:fetch')->everyFiveMinutes();
         // 古い運行状況を削除するコマンドを毎日実行するようスケジュール
         $schedule->command('app:delete-old-statuses')->daily();  
+        // 必須通知時刻の通知ジョブを毎分実行するようスケジュール
+        $schedule->job(new SendFixedTimeNotifications)->everyMinute();
+        // 運行状況更新チェックと通知ジョブを毎分実行するようスケジュール
+        $schedule->job(new CheckStatusUpdatesAndNotify)->everyMinute();
     }
 
     /**
