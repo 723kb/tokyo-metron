@@ -5,6 +5,12 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * LINE Notify サービスクラス
+ * 
+ * LINE Notify APIとの通信を担当し、通知の送信や
+ * アクセストークンの取得を行う。
+ */
 class LineNotifyService
 {
     // LINE Notify APIのエンドポイントURL
@@ -19,15 +25,27 @@ class LineNotifyService
      */
     public function sendNotification($accessToken, $message)
     {
-        // HTTP POSTリクエストを送信
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,  // // 認証ヘッダーにアクセストークンを設定
-        ])->asForm()->post($this->apiUrl, [
-            'message' => $message,  // 送信するメッセージ
-        ]);
+        try {
+            // HTTP POSTリクエストを送信
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,  // // 認証ヘッダーにアクセストークンを設定
+            ])->asForm()->post($this->apiUrl, [
+                'message' => $message,  // 送信するメッセージ
+            ]);
 
-        // レスポンスが成功（2xx）かどうかを返す
-        return $response->successful();
+            // レスポンスが成功でない場合、エラーをログに記録して false を返す
+            if (!$response->successful()) {
+                Log::error('Failed to send LINE notification', ['status' => $response->status(), 'body' => $response->body()]);
+                return false;
+            }
+
+            // 通知の送信に成功した場合、true を返す
+            return true;
+        } catch (\Exception $e) {
+            // 例外が発生した場合、エラーをログに記録して false を返す
+            Log::error('Exception occurred while sending LINE notification', ['error' => $e->getMessage()]);
+            return false;
+        }
     }
 
     /**
@@ -49,6 +67,7 @@ class LineNotifyService
             ]);
 
             // リクエストとレスポンスの内容をログに記録（デバッグ用）
+            // 本番環境では機密情報をログに記録しないよう注意！！
             Log::info('LINE Notify token request', [
                 'request' => [
                     'grant_type' => 'authorization_code',

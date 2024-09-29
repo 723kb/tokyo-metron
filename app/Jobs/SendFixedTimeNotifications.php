@@ -7,10 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\UserLineSetting;
-use App\Models\StatusUpdate;
-use App\Services\LineNotifyService;
-use Carbon\Carbon;
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Log;
 
 /**
  * 必須通知時刻に設定された通知を送信するジョブクラス
@@ -22,42 +20,18 @@ class SendFixedTimeNotifications implements ShouldQueue
     /**
      * ジョブを実行する
      *
-     * @param LineNotifyService $lineNotifyService LINE Notify サービス
+     * @param NotificationService $notificationService 通知サービス
      * @return void
      */
-    public function handle(LineNotifyService $lineNotifyService)
+    public function handle(NotificationService $notificationService)
     {
-        // 現在の日時を取得
-        $now = Carbon::now();
-        $currentTime = $now->format('H:i:s');
-        $dayOfWeek = strtolower($now->englishDayOfWeek);
+        // ジョブの開始をログに記録
+        Log::info('Starting SendFixedTimeNotifications job');
 
-        // 通知設定を取得
-        $userSettings = UserLineSetting::where('notify_status_flag', true)
-            ->where("notify_{$dayOfWeek}", true)
-            ->where('notify_fixed_time', $currentTime)
-            ->with(['user.lineNotifyToken', 'line'])
-            ->get();
+        // 通知サービスを使用して固定時間の通知を処理
+        $notificationService->processFixedTimeNotifications();
 
-        // 各ユーザー設定に対して処理
-        foreach ($userSettings as $setting) {
-            // ユーザーとLINE Notifyトークンが存在する場合のみ処理
-            if ($setting->user && $setting->user->lineNotifyToken) {
-                // 最新の運行状況を取得
-                $latestStatus = StatusUpdate::where('line_id', $setting->line_id)
-                    ->latest()
-                    ->first();
-
-                // 運行状況が存在する場合、通知を送信
-                if ($latestStatus) {
-                    /**
-                     * 通知メッセージの作成
-                     * 「時間帯通知」の文言は本番環境では不要かも
-                     */
-                    $message = "必須通知\n路線名: {$setting->line->name}\n状況: {$latestStatus->status}\n内容: {$latestStatus->content}\n更新時間: {$latestStatus->created_at}";
-                    $lineNotifyService->sendNotification($setting->user->lineNotifyToken->token, $message);
-                }
-            }
-        }
+        // ジョブの終了をログに記録
+        Log::info('Finished SendFixedTimeNotifications job');
     }
 }
