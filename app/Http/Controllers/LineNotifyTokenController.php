@@ -92,25 +92,17 @@ class LineNotifyTokenController extends Controller
         $user = Auth::user();
         // 通知サービスを使用してLINE Notifyとの連携を解除
         $result = $this->notificationService->disconnectLineNotify($user);
-        
-        if ($result) {
-            // 成功した場合
-            $message = 'LINE Notifyとの連携を解除しました。';
-            $type = 'success';
-            $statusCode = 200; // HTTP 200 OK
-        } else {
-            // 失敗した場合
-            $message = 'LINE Notifyとの連携解除に失敗しました。';
-            $type = 'error';
-            $statusCode = 500; // HTTP 500 Internal Server Error
-        }
-    
-        return Inertia::render('NotificationSettings', [
+
+        $message = $result['success'] ? 'LINE Notifyとの連携を解除しました。' : 'LINE Notifyとの連携解除に失敗しました。';
+        $type = $result['success'] ? 'success' : 'error';
+
+        // 通知設定ページにリダイレクト こうしないとURLが変わる
+        return redirect()->route('notification-settings.show')->with([
             'flash' => [
                 'message' => $message,
                 'type' => $type
             ],
             'isLineConnected' => false
-        ])->toResponse(request())->setStatusCode($statusCode);
+        ]);
     }
 }

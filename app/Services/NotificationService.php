@@ -108,7 +108,14 @@ class NotificationService
 
         // 各運行状況に対して処理を実行
         foreach ($latestStatuses as $status) {
-            $this->processStatusUpdate($status);
+            try {
+                $this->processStatusUpdate($status);
+            } catch (\Exception $e) {
+                Log::error('Error processing status update', [
+                    'status_id' => $status->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }
 
@@ -158,6 +165,26 @@ class NotificationService
     }
 
     /**
+     * トークンの有効性をチェックする
+     *
+     * @param string $token
+     * @return bool
+     */
+    private function isTokenValid($token)
+    {
+        try {
+            $response = Http::withToken($token)->get('https://notify-api.line.me/api/status');
+            // レスポンスが成功（2xx系のステータスコード）であればtrueを返す
+            return $response->successful();
+        } catch (\Exception $e) {
+            // 例外が発生した場合、エラーをログに記録
+            Log::error('Error checking token validity', ['error' => $e->getMessage()]);
+            // エラーが発生した場合は、安全のためfalseを返す
+            return false;
+        }
+    }
+
+    /**
      * 通知を送信する
      * 
      * ユーザーの設定と運行状況に基づいて通知を送信。
@@ -170,12 +197,25 @@ class NotificationService
      */
     private function sendNotification(UserLineSetting $setting, StatusUpdate $status, bool $isFixedTime)
     {
+        if (!$setting->user || !$setting->user->lineNotifyToken) {
+            Log::info('User or LineNotifyToken not found', ['user_id' => $setting->user_id]);
+            return;
+        }
+
+        $token = $setting->user->lineNotifyToken->token;
+
+        // トークンの有効性をチェック
+        if (!$this->isTokenValid($token)) {
+            Log::error('Invalid LINE Notify token', ['user_id' => $setting->user_id]);
+            return;
+        }
+
         // 各IDを組み合わせてキャッシュキーを生成
         $cacheKey = "last_notification_{$setting->user_id}_{$status->line_id}_{$status->id}";
         // 最後の通知された情報を取得
         $lastNotification = Cache::get($cacheKey);
 
-        // 重複通知のチェック(必須通知はこのチェックを飛ばして常に通知する)
+        // 重複通知のチェック（必須通知の場合はスキップしない）
         if (!$isFixedTime && $lastNotification) {
             if (
                 // 前回の通知と今回の通知の状態、内容、更新時間を比較
@@ -198,7 +238,7 @@ class NotificationService
         // 通知メッセージを作成
         $message = $this->createNotificationMessage($setting, $status, $isFixedTime);
         // LINE Notifyを使用して通知を送信
-        $result = $this->lineNotifyService->sendNotification($setting->user->lineNotifyToken->token, $message);
+        $result = $this->lineNotifyService->sendNotification($token, $message);
 
         if ($result) {
             /**
@@ -263,18 +303,26 @@ class NotificationService
 
         // 各ユーザー設定に対して処理を実行
         foreach ($userSettings as $setting) {
-            // ユーザーとLINE Notifyトークンが存在する場合のみ処理
-            if ($setting->user && $setting->user->lineNotifyToken) {
-                // 該当する路線の最新の運行状況を取得
-                $latestStatus = StatusUpdate::where('line_id', $setting->line_id)
-                    ->latest()
-                    ->first();
+            try {
+                // ユーザーとLINE Notifyトークンが存在する場合のみ処理
+                if ($setting->user && $setting->user->lineNotifyToken) {
+                    // 該当する路線の最新の運行状況を取得
+                    $latestStatus = StatusUpdate::where('line_id', $setting->line_id)
+                        ->latest()
+                        ->first();
 
-                // 運行状況が存在する場合、通知を送信
-                if ($latestStatus) {
-                    // 第3引数のtrueは、これが必須通知であることを示す
-                    $this->sendNotification($setting, $latestStatus, true);
+                    // 運行状況が存在する場合、通知を送信
+                    if ($latestStatus) {
+                        // 第3引数のtrueは、これが必須通知であることを示す
+                        $this->sendNotification($setting, $latestStatus, true);
+                    }
                 }
+            } catch (\Exception $e) {
+                // エラーが発生した場合、ログに記録
+                Log::error('Error processing fixed time notification', [
+                    'user_id' => $setting->user_id,
+                    'error' => $e->getMessage()
+                ]);
             }
         }
     }
