@@ -7,6 +7,7 @@ use App\Services\LineNotifyService;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class LineNotifyTokenController extends Controller
 {
@@ -91,11 +92,25 @@ class LineNotifyTokenController extends Controller
         $user = Auth::user();
         // 通知サービスを使用してLINE Notifyとの連携を解除
         $result = $this->notificationService->disconnectLineNotify($user);
+        
         if ($result) {
             // 成功した場合
-            return redirect()->route('notification-settings.show')->with('success', 'LINE Notifyとの連携を解除しました。');
+            $message = 'LINE Notifyとの連携を解除しました。';
+            $type = 'success';
+            $statusCode = 200; // HTTP 200 OK
+        } else {
+            // 失敗した場合
+            $message = 'LINE Notifyとの連携解除に失敗しました。';
+            $type = 'error';
+            $statusCode = 500; // HTTP 500 Internal Server Error
         }
-        // 失敗した場合
-        return redirect()->route('notification-settings.show')->with('error', 'LINE Notifyとの連携解除に失敗しました。');
+    
+        return Inertia::render('NotificationSettings', [
+            'flash' => [
+                'message' => $message,
+                'type' => $type
+            ],
+            'isLineConnected' => false
+        ])->toResponse(request())->setStatusCode($statusCode);
     }
 }

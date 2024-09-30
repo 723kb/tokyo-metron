@@ -1,10 +1,12 @@
-import React, { useEffect } from "react";
-import { Head, useForm } from "@inertiajs/react";
+import React, { useState, useEffect } from "react";
+import { Head } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import LineNotificationSetting from "@/Components/LineNotificationSetting";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
-import ActionLink from "@/Components/ActionLink";
 import MessageAlert from "@/Components/MessageAlert";
+import LineNotifyConnection from "@/Components/LineNotifyConnection";
+import NotificationSettingsForm from "@/Components/NotificationSettingsForm";
+import { useFlashMessage } from "@/hooks/useFlashMessage";
+import { useLineNotifyConnection } from "@/hooks/useLineNotifyConnection";
 
 /**
  * 通知設定ページのコンポーネント
@@ -23,83 +25,78 @@ const NotificationSettings = ({
     isLineConnected = false,
     lineConnectUrl = null,
 }) => {
+    // LINE Notify連携状態を管理するローカルステート
+    const [localIsLineConnected, setLocalIsLineConnected] =
+        useState(isLineConnected);
+
+    // propsのisLineConnectedが変更された場合、ローカルステートを更新
+    useEffect(() => {
+        setLocalIsLineConnected(isLineConnected);
+    }, [isLineConnected]);
+
     // カスタムフックを使用して通知設定の状態と操作関数を取得
     const {
         data,
         processing,
-        errors,
         message: hookMessage,
         setMessage,
         isChanged, // 変更を追跡するフラグ
         isSubmitting,
         handleChange,
         handleToggle,
-        handleSubmit,
+        handleSubmit: originalHandleSubmit, // 元の送信ハンドラ
     } = useNotificationSettings(userLineSettings);
 
-    const { post } = useForm();
+    // フラッシュメッセージ処理用カスタムフック
+    useFlashMessage(flashMessage, setMessage);
 
-    // フラッシュメッセージの処理と3秒後の消去
-    useEffect(() => {
-        if (flashMessage) {
-            setMessage({ text: flashMessage, type: "success" });
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 3000);
+    // LINE Notify接続/切断用カスタムフック
+    const { handleDisconnect: originalHandleDisconnect } =
+        useLineNotifyConnection();
 
-            // コンポーネントのアンマウント時にタイマーをクリア
-            return () => clearTimeout(timer);
+    // お気に入り路線の有無を確認
+    const hasFavoriteLines = data.userLineSettings.some(
+        (setting) => setting.favorite_flag === 1,
+    );
+
+    /**
+     * 設定送信ハンドラ
+     * 設定保存が成功した場合、LINE Notify連携状態を更新する
+     */
+    const handleSubmit = async (e) => {
+        const result = await originalHandleSubmit(e);
+        // 設定保存が成功した場合、LINE Notify連携状態を更新
+        if (result && result.success) {
+            setIsLineConnected(true);
         }
-    }, [flashMessage, setMessage]);
-
-    // LINE Notify連携ボタンのクリックハンドラ
-    const handleLineNotifyConnect = () => {
-        window.open(lineConnectUrl, "_blank", "noopener,noreferrer"); // 新しいページで開かないとCORSエラーになる
     };
 
-    // LINE Notify連携解除のハンドラ
-    const handleDisconnectLineNotify = () => {
-        if (confirm("LINE Notifyとの連携を解除しますか？")) {
-            post(
-                route("line-notify.disconnect"),
-                {},
-                {
-                    preserveState: false, // 状態を保持しない
-                    preserveScroll: false, // スクロール位置を保持しない
-                    onSuccess: () => {
-                        alert("LINE Notifyとの連携を解除しました。");
-                    },
-                    onError: (errors) => {
-                        console.error(
-                            "Error disconnecting LINE Notify:",
-                            errors,
-                        );
-                        alert(
-                            "LINE Notifyとの連携解除中にエラーが発生しました。",
-                        );
-                    },
-                },
-            );
+    /**
+     * LINE Notify連携解除ハンドラ
+     * 連携解除が成功した場合、LINE Notify連携状態を更新する
+     */
+    const handleDisconnect = async () => {
+        const result = await originalHandleDisconnect();
+        if (result.success) {
+            setLocalIsLineConnected(false);
         }
     };
 
     return (
         <Authenticated>
             <Head title="通知設定" />
-
             <div className="py-12">
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div className="p-6 bg-white border-b border-gray-200">
                         <h1 className="text-2xl font-bold mb-4">通知設定</h1>
 
-                        {/* メッセージアラートの表示 */}
+                        {/* フックからのメッセージがある場合、アラートを表示 */}
                         {hookMessage && (
                             <MessageAlert
                                 message={hookMessage.text}
                                 type={hookMessage.type}
                             />
                         )}
-
                         {/* フォームの状態に変更があった場合の警告メッセージ */}
                         {isChanged && !isSubmitting && (
                             <MessageAlert
@@ -108,81 +105,31 @@ const NotificationSettings = ({
                             />
                         )}
 
-                        {/* LINE Notify 連携状況 */}
-                        <div className="mb-4 p-4 border-b rounded">
-                            <h2 className="text-xl font-semibold mb-2">
-                                LINE Notify 連携
-                            </h2>
-                            {isLineConnected ? (
-                                // LINE Notifyと連携済みの場合
-                                <>
-                                    <p className="text-green-600 mb-2">
-                                        LINE Notifyと連携済みです
-                                    </p>
-                                    <button
-                                        onClick={handleDisconnectLineNotify}
-                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                                    >
-                                        LINE Notify連携を解除
-                                    </button>
-                                </>
-                            ) : (
-                                // LINE Notifyと未連携の場合
-                                <>
-                                    <p className="mb-2">
-                                        通知を受け取るにはLINE
-                                        Notifyとの連携が必要です
-                                    </p>
-                                    <button
-                                        onClick={handleLineNotifyConnect}
-                                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                                    >
-                                        LINE Notifyと連携する
-                                    </button>
-                                </>
-                            )}
-                        </div>
+                        {/* LINE Notify連携コンポーネント */}
+                        <LineNotifyConnection
+                            isConnected={localIsLineConnected}
+                            connectUrl={lineConnectUrl}
+                            onDisconnect={handleDisconnect}
+                        />
 
-                        {/* お気に入り路線の有無に基づいて表示を切り替え */}
-                        {data.userLineSettings.some(
-                            (setting) => setting.favorite_flag === 1,
-                        ) ? (
-                            // お気に入り路線がある場合、設定フォームを表示
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleSubmit(e);
-                                }}
-                            >
-                                {data.userLineSettings
-                                    .filter(
-                                        (setting) =>
-                                            setting.favorite_flag === 1,
-                                    )
-                                    .map((setting, index) => (
-                                        <LineNotificationSetting
-                                            key={setting.id}
-                                            setting={setting}
-                                            index={index}
-                                            handleChange={handleChange}
-                                            handleToggle={handleToggle}
-                                        />
-                                    ))}
-                                {/* 設定保存ボタン */}
-                                <ActionLink
-                                    onClick={handleSubmit}
-                                    disabled={processing}
-                                >
-                                    設定を保存
-                                </ActionLink>
-                            </form>
-                        ) : (
+                        {!hasFavoriteLines ? (
                             // お気に入り路線がない場合、メッセージを表示
                             <div className="mb-4 p-4 border rounded">
                                 <p className="text-lg">
                                     通知設定をするには路線のお気に入り登録が必要です
                                 </p>
                             </div>
+                        ) : (
+                            // お気に入り路線がある場合、設定フォームを表示
+                            <NotificationSettingsForm
+                                settings={data.userLineSettings.filter(
+                                    (setting) => setting.favorite_flag === 1,
+                                )}
+                                onChange={handleChange}
+                                onToggle={handleToggle}
+                                onSubmit={handleSubmit}
+                                processing={processing}
+                            />
                         )}
                     </div>
                 </div>

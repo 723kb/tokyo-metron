@@ -73,19 +73,19 @@ class NotificationService
                     $lineNotifyToken->delete();
                     // ログに成功メッセージを記録
                     Log::info('LINE Notify disconnected', ['user_id' => $user->id]);
-                    return true;
+                    return ['success' => true, 'message' => 'LINE Notifyとの連携を解除しました。'];
                 } else {
                     // APIリクエストが失敗した場合、エラーをログに記録
                     Log::error('Failed to revoke LINE Notify token', ['status' => $response->status(), 'body' => $response->body()]);
-                    return false;
+                    return ['success' => false, 'message' => 'LINE Notifyとの連携解除に失敗しました。'];
                 }
             } catch (\Exception $e) {
                 // 例外が発生した場合、エラーをログに記録
                 Log::error('Exception occurred while revoking LINE Notify token', ['error' => $e->getMessage()]);
-                return false;
+                return ['success' => false, 'message' => 'LINE Notifyとの連携解除中にエラーが発生しました。'];
             }
         }
-        return false;
+        return ['success' => false, 'message' => 'LINE Notify連携が見つかりませんでした。'];
     }
 
     /**
@@ -245,23 +245,34 @@ class NotificationService
      */
     public function processFixedTimeNotifications()
     {
+        // 現在の日時を取得
         $now = Carbon::now();
         $currentTime = $now->format('H:i:s');
+        // 現在の曜日を小文字の英語で取得
         $dayOfWeek = strtolower($now->englishDayOfWeek);
 
+        /**
+         * 通知設定を取得
+         * 条件：通知がオン、現在の曜日の通知が有効、現在時刻が通知時刻と一致
+         */
         $userSettings = UserLineSetting::where('notify_status_flag', true)
             ->where("notify_{$dayOfWeek}", true)
             ->where('notify_fixed_time', $currentTime)
-            ->with(['user.lineNotifyToken', 'line'])
+            ->with(['user.lineNotifyToken', 'line']) // 関連するユーザー、LINEトークン、路線情報も同時に取得
             ->get();
 
+        // 各ユーザー設定に対して処理を実行
         foreach ($userSettings as $setting) {
+            // ユーザーとLINE Notifyトークンが存在する場合のみ処理
             if ($setting->user && $setting->user->lineNotifyToken) {
+                // 該当する路線の最新の運行状況を取得
                 $latestStatus = StatusUpdate::where('line_id', $setting->line_id)
                     ->latest()
                     ->first();
 
+                // 運行状況が存在する場合、通知を送信
                 if ($latestStatus) {
+                    // 第3引数のtrueは、これが必須通知であることを示す
                     $this->sendNotification($setting, $latestStatus, true);
                 }
             }
