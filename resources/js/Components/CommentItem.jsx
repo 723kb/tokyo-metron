@@ -49,12 +49,12 @@ const CommentItem = ({ comment, currentUserId, onCommentDeleted }) => {
             <div className="flex justify-between items-center text-sm text-gray-500">
                 {/* コメント投稿日時 */}
                 <p>{new Date(comment.created_at).toLocaleString()}</p>
-                <div className="flex">
+                <div className="flex space-x-6">
                     {/* 現在ログインしているユーザーがコメント投稿者の時に削除ボタンを表示 */}
                     {currentUserId === comment.user_id && (
                         <ActionLink
                             onClick={handleDelete}
-                            className="text-red-500 hover:text-black focus:outline-none p-1 bg-transparent hover:bg-transparent"
+                            className="w-20 flex items-center justify-center border-none text-red-500 hover:text-black bg-transparent rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-300"
                             title="削除"
                         >
                             <TrashIcon />

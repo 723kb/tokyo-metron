@@ -21,10 +21,12 @@ const Logo = ({ isAuthenticated }) => {
                 <img
                     src={logoSrc}
                     alt="トーキョーめとろんロゴ"
-                    className="w-[100px] mr-2"
+                    className="w-[60px] sm:w-[80px] md:w-[100px] mr-2"
                 />
             </Link>
-            <h1 className="text-2xl font-bold">トーキョーめとろん</h1>
+            <h1 className="text-md sm:text-xl md:text-2xl font-bold">
+                トーキョーめとろん
+            </h1>
         </div>
     );
 };

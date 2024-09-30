@@ -28,17 +28,15 @@ const StatusUpdateDetails = ({
         {/* 運行状況の内容 */}
         <p className="mt-2">{statusUpdate.content}</p>
         <div className="flex justify-between items-center mt-4">
-            {/* コメント入力欄の表示/非表示に合わせてボタンのスタイルを変更 */}
-            <ActionLink
-                onClick={onCommentClick}
-                className={`font-bold py-2 px-4 rounded ${
-                    showCommentForm
-                        ? "bg-gray-200 hover:bg-gray-300"
-                        : "bg-gray-600 hover:bg-gray-400 text-white"
-                }`}
-            >
-                {showCommentForm ? "キャンセル" : "コメントする"}
-            </ActionLink>
+            {/* コメント欄が表示されていない時のみボタンを表示 */}
+            {!showCommentForm && (
+                <ActionLink
+                    onClick={onCommentClick}
+                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
+                >
+                    コメントする
+                </ActionLink>
+            )}
             {/* コメント数 */}
             <CommentCount comments={commentsCount} />
         </div>

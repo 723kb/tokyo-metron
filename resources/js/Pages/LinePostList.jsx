@@ -21,7 +21,7 @@ const LinePostList = ({ line, statusUpdates }) => {
 
             {/* ヒーローセクション */}
             <LineHeroSection lineName={line.name} lineColor={line.color_code} />
-            <div className="py-12">
+            <div className="py-2 sm:py-12">
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         {statusUpdates.map((update) => (
                             <Link

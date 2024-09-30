@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Head } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import LineHeroSection from "@/Components/LineHeroSection";
@@ -14,44 +14,63 @@ import CommentSection from "@/Components/CommentSection";
  * @param {Object} props.line - 路線情報
  * @param {Object} props.statusUpdate - 特定の運行状況更新
  * @param {Array} props.comments - 運行状況に対するコメント
- *  @param {string} props.message - コメントアクション後に表示するメッセージ
+ * @param {string} props.initialMessage - 初期メッセージ
  * @param {Object} props.auth - 認証情報
  * @returns {JSX.Element} 路線投稿詳細ページ
  */
-const LinePostDetail = ({ line, statusUpdate, comments, message, auth }) => {
+const LinePostDetail = ({
+    line,
+    statusUpdate,
+    comments,
+    initialMessage,
+    auth,
+}) => {
+    // コメントフォームの表示状態を管理するstate
     const [showCommentForm, setShowCommentForm] = useState(false); // 最初はコメント入力欄非表示
-    const [localMessage, setLocalMessage] = useState(message); // 現在のメッセージの状態
-    const [messageType, setMessageType] = useState("success"); // メッセージの種類を追跡するための状態
+
+    // メッセージの状態を管理するstate
+    const [message, setMessage] = useState({
+        text: initialMessage || "",
+        type: initialMessage ? "success" : "",
+    });
 
     /**
      * メッセージを3秒後に消去するEffect
      */
     useEffect(() => {
-        if (localMessage) {
+        if (message.text) {
             const timer = setTimeout(() => {
-                setLocalMessage("");
-                setMessageType(""); // メッセージタイプもリセット
+                setMessage({ text: "", type: "" });
             }, 3000);
+            // クリーンアップ関数：コンポーネントのアンマウント時やmessage.textが変更される前にタイマーをクリア
             return () => clearTimeout(timer);
         }
-    }, [localMessage]);
+    }, [message.text]);
 
     /**
      * コメント追加時のハンドラー
+     * コメントフォームを非表示にし、成功メッセージを設定
      */
-    const handleCommentAdded = () => {
-        setShowCommentForm(false); // コメント入力欄は非表示に
-        setLocalMessage("コメントしました！");
-        setMessageType("success");
+    const handleCommentAdded = useCallback(() => {
+        setShowCommentForm(false);
+        setMessage({ text: "コメントしました！", type: "success" });
+    }, [setShowCommentForm, setMessage]);
+
+    /**
+     * コメントフォームのキャンセルハンドラー
+     * コメントフォームを非表示にする
+     */
+    const handleCancelComment = () => {
+        setShowCommentForm(false);
     };
 
-    /** 
+    /**
      * コメント削除時のハンドラー
+     * 削除成功メッセージを設定
      */
-    const handleCommentDeleted = () => {
-        setLocalMessage("コメントを削除しました！");
-        setMessageType("info");
-    };
+    const handleCommentDeleted = useCallback(() => {
+        setMessage({ text: "コメントを削除しました！", type: "info" });
+    }, [setMessage]);
 
     // 必要なデータが存在しない場合のエラー表示
     if (!line || !statusUpdate) return <div>情報が見つかりません。</div>;
@@ -67,13 +86,13 @@ const LinePostDetail = ({ line, statusUpdate, comments, message, auth }) => {
 
             {/* ヒーローセクション */}
             <LineHeroSection lineName={line.name} lineColor={line.color_code} />
-            <div className="py-12">
+            <div className="py-2 sm:py-12">
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     {/* コメントアクション後に表示するメッセージ */}
-                    {localMessage && (
+                    {message.text && (
                         <MessageAlert
-                            message={localMessage}
-                            type={messageType}
+                            message={message.text}
+                            type={message.type}
                         />
                     )}
                     {/* 運行状況の詳細情報 */}
@@ -91,6 +110,7 @@ const LinePostDetail = ({ line, statusUpdate, comments, message, auth }) => {
                             lineId={line.id}
                             postId={statusUpdate.id}
                             onCommentAdded={handleCommentAdded}
+                            onCancel={handleCancelComment}
                         />
                     )}
                     {/* コメントセクション */}
