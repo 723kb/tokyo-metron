@@ -106,6 +106,8 @@ class NotificationService
             ->get()
             ->unique('line_id');
 
+        Log::info('Processing status updates', ['count' => $latestStatuses->count()]);
+
         // 各運行状況に対して処理を実行
         foreach ($latestStatuses as $status) {
             try {
@@ -137,6 +139,12 @@ class NotificationService
             ->where('notify_' . strtolower(Carbon::now()->englishDayOfWeek), true)
             ->get();
 
+        Log::info('Processing status update', [
+            'line_id' => $status->line_id,
+            'status' => $status->status,
+            'user_settings_count' => $userSettings->count()
+        ]);
+
         // 各ユーザー設定に対して通知処理を実行
         foreach ($userSettings as $setting) {
             if ($this->shouldSendNotification($setting)) {
@@ -157,11 +165,11 @@ class NotificationService
     private function shouldSendNotification(UserLineSetting $setting): bool
     {
         $now = Carbon::now();
-        $currentTime = $now->format('H:i:s');
+        $currentTime = $now->format('H:i'); // 通知が来ない原因になるので秒を削除
 
         // 現在時刻が通知時間範囲内にあるか、または必須通知時刻と一致する場合に true を返す
         return ($setting->notify_start_time <= $currentTime && $setting->notify_end_time >= $currentTime)
-            || $setting->notify_fixed_time == $currentTime;
+            || substr($setting->notify_fixed_time, 0, 5) == $currentTime; // 固定時間の秒を無視
     }
 
     /**
@@ -216,7 +224,7 @@ class NotificationService
         }
 
         // 各IDを組み合わせてキャッシュキーを生成
-        $cacheKey = "last_notification_{$setting->user_id}_{$status->line_id}_{$status->id}";
+        $cacheKey = "last_notification_{$setting->user_id}_{$status->line_id}";
         // 最後の通知された情報を取得
         $lastNotification = Cache::get($cacheKey);
 
@@ -225,10 +233,9 @@ class NotificationService
             if (
                 // 前回の通知と今回の通知の状態、内容、更新時間を比較
                 $lastNotification['status'] == $status->status &&
-                $lastNotification['content'] == $status->content &&
-                $lastNotification['updated_at'] == $status->updated_at
+                $lastNotification['content'] == $status->content  &&
+                Carbon::parse($lastNotification['updated_at'])->diffInMinutes(now()) < 6  // 6時間重複チェックする
             ) {
-                // 重複する通知の場合、ログを記録してスキップ
                 Log::info('Skipping duplicate notification', [
                     'user_id' => $setting->user_id,
                     'line_id' => $status->line_id,
@@ -255,7 +262,7 @@ class NotificationService
                 'content' => $status->content,
                 'updated_at' => $status->updated_at,
                 'time' => now()
-            ], now()->addHours(1));
+            ], now()->addHours(24));  // キャッシュの有効期間を24時間
             Log::info('Notification sent', [
                 'user_id' => $setting->user_id,
                 'line_id' => $status->line_id,
@@ -284,7 +291,8 @@ class NotificationService
     private function createNotificationMessage(UserLineSetting $setting, StatusUpdate $status, bool $isFixedTime): string
     {
         $prefix = $isFixedTime ? "必須通知" : "時間帯通知";
-        return "{$prefix}\n路線名: {$setting->line->name}\n状況: {$status->status}\n内容: {$status->content}\n更新時間: {$status->created_at}";
+        $updatedAt = $status->created_at->format('Y-m-d H:i'); // 秒を削除
+        return "{$prefix}\n路線名: {$setting->line->name}\n状況: {$status->status}\n内容: {$status->content}\n更新時間: {$updatedAt}";
     }
 
     /**
@@ -296,7 +304,7 @@ class NotificationService
     {
         // 現在の日時を取得
         $now = Carbon::now();
-        $currentTime = $now->format('H:i:s');
+        $currentTime = $now->format('H:i');  // 通知が来ない原因になるので秒を削除
         // 現在の曜日を小文字の英語で取得
         $dayOfWeek = strtolower($now->englishDayOfWeek);
 
@@ -311,57 +319,63 @@ class NotificationService
          */
         $userSettings = UserLineSetting::where('notify_status_flag', true)
             ->where("notify_{$dayOfWeek}", true)
-            ->where('notify_fixed_time', $currentTime)
+            ->whereRaw("TIME_FORMAT(notify_fixed_time, '%H:%i') = ?", [$currentTime])  // H:iで一致するものを探す
             ->with(['user.lineNotifyToken', 'line']) // 関連するユーザー、LINEトークン、路線情報も同時に取得
             ->get();
 
-            Log::debug('User settings query result', [
-                'count' => $userSettings->count()
-            ]);
+        Log::debug('User settings query result', [
+            'count' => $userSettings->count()
+        ]);
 
         // 各ユーザー設定に対して処理を実行
         foreach ($userSettings as $setting) {
-            try {
-                Log::info('Processing user setting', [
-                    'user_id' => $setting->user_id,
-                    'line_id' => $setting->line_id,
-                    'notify_fixed_time' => $setting->notify_fixed_time
-                ]);
-
-                // ユーザーとLINE Notifyトークンが存在する場合のみ処理
-                if ($setting->user && $setting->user->lineNotifyToken) {
-                    // 該当する路線の最新の運行状況を取得
-                    $latestStatus = StatusUpdate::where('line_id', $setting->line_id)
-                        ->latest()
-                        ->first();
-
-                    // 運行状況が存在する場合、通知を送信
-                    if ($latestStatus) {
-                        Log::info('Sending fixed time notification', [
-                            'user_id' => $setting->user_id,
-                            'line_id' => $setting->line_id,
-                            'status_id' => $latestStatus->id
-                        ]);
-                        // 第3引数のtrueは、これが必須通知であることを示す
-                        $this->sendNotification($setting, $latestStatus, true);
-                    } else {
-                        Log::warning('No latest status found for line', [
-                            'line_id' => $setting->line_id
-                        ]);
-                    }
-                } else {
-                    Log::warning('User or LINE Notify token not found', [
-                        'user_id' => $setting->user_id
-                    ]);
-                }
-            } catch (\Exception $e) {
-                // エラーが発生した場合、ログに記録
-                Log::error('Error processing fixed time notification', [
-                    'user_id' => $setting->user_id,
-                    'error' => $e->getMessage()
-                ]);
-            }
+            $this->processFixedTimeNotificationForUser($setting);
         }
+
         Log::info('Finished processing fixed time notifications');
+    }
+
+    /**
+     * 個別のユーザー設定に対して必須通知を処理する
+     *
+     * @param {UserLineSetting} $setting - 処理するユーザーの通知設定
+     * @return {void}
+     *
+     * @throws {Exception} 処理中に発生した例外はキャッチされ、ログに記録
+     */
+    private function processFixedTimeNotificationForUser(UserLineSetting $setting)
+    {
+        try {
+            // ユーザー設定の処理開始をログに記録
+            Log::info('Processing user setting', [
+                'user_id' => $setting->user_id,
+                'line_id' => $setting->line_id,
+                'notify_fixed_time' => $setting->notify_fixed_time
+            ]);
+
+            // ユーザーとLINE Notifyトークンの存在確認
+            if (!$setting->user || !$setting->user->lineNotifyToken) {
+                Log::warning('User or LINE Notify token not found', ['user_id' => $setting->user_id]);
+                return;
+            }
+
+            // 該当する路線の最新の運行状況を取得
+            $latestStatus = StatusUpdate::where('line_id', $setting->line_id)
+                ->latest()
+                ->first();
+
+            // 運行状況が存在する場合、通知を送信
+            if ($latestStatus) {
+                $this->sendNotification($setting, $latestStatus, true);
+            } else {
+                Log::warning('No latest status found for line', ['line_id' => $setting->line_id]);
+            }
+        } catch (\Exception $e) {
+            // エラーが発生した場合、ログに記録
+            Log::error('Error processing fixed time notification', [
+                'user_id' => $setting->user_id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }
