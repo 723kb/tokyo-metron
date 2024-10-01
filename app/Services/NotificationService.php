@@ -197,8 +197,13 @@ class NotificationService
      */
     private function sendNotification(UserLineSetting $setting, StatusUpdate $status, bool $isFixedTime)
     {
+        Log::info('Attempting to send notification', [
+            'user_id' => $setting->user_id,
+            'line_id' => $status->line_id,
+            'is_fixed_time' => $isFixedTime
+        ]);
         if (!$setting->user || !$setting->user->lineNotifyToken) {
-            Log::info('User or LineNotifyToken not found', ['user_id' => $setting->user_id]);
+            Log::warning('User or LineNotifyToken not found', ['user_id' => $setting->user_id]);
             return;
         }
 
@@ -260,7 +265,11 @@ class NotificationService
             ]);
         } else {
             // 送信失敗時、エラーログを記録
-            Log::error('Failed to send notification', ['user_id' => $setting->user_id, 'line_id' => $status->line_id]);
+            Log::error('Failed to send notification', [
+                'user_id' => $setting->user_id,
+                'line_id' => $status->line_id,
+                'type' => $isFixedTime ? '必須通知' : '時間帯通知'
+            ]);
         }
     }
 
@@ -291,6 +300,11 @@ class NotificationService
         // 現在の曜日を小文字の英語で取得
         $dayOfWeek = strtolower($now->englishDayOfWeek);
 
+        Log::info('Processing fixed time notifications', [
+            'current_time' => $currentTime,
+            'day_of_week' => $dayOfWeek
+        ]);
+
         /**
          * 通知設定を取得
          * 条件：通知がオン、現在の曜日の通知が有効、現在時刻が通知時刻と一致
@@ -301,9 +315,19 @@ class NotificationService
             ->with(['user.lineNotifyToken', 'line']) // 関連するユーザー、LINEトークン、路線情報も同時に取得
             ->get();
 
+            Log::info('Found user settings for fixed time notifications', [
+                'count' => $userSettings->count()
+            ]);
+
         // 各ユーザー設定に対して処理を実行
         foreach ($userSettings as $setting) {
             try {
+                Log::info('Processing user setting', [
+                    'user_id' => $setting->user_id,
+                    'line_id' => $setting->line_id,
+                    'notify_fixed_time' => $setting->notify_fixed_time
+                ]);
+
                 // ユーザーとLINE Notifyトークンが存在する場合のみ処理
                 if ($setting->user && $setting->user->lineNotifyToken) {
                     // 該当する路線の最新の運行状況を取得
@@ -313,9 +337,22 @@ class NotificationService
 
                     // 運行状況が存在する場合、通知を送信
                     if ($latestStatus) {
+                        Log::info('Sending fixed time notification', [
+                            'user_id' => $setting->user_id,
+                            'line_id' => $setting->line_id,
+                            'status_id' => $latestStatus->id
+                        ]);
                         // 第3引数のtrueは、これが必須通知であることを示す
                         $this->sendNotification($setting, $latestStatus, true);
+                    } else {
+                        Log::warning('No latest status found for line', [
+                            'line_id' => $setting->line_id
+                        ]);
                     }
+                } else {
+                    Log::warning('User or LINE Notify token not found', [
+                        'user_id' => $setting->user_id
+                    ]);
                 }
             } catch (\Exception $e) {
                 // エラーが発生した場合、ログに記録
@@ -325,5 +362,6 @@ class NotificationService
                 ]);
             }
         }
+        Log::info('Finished processing fixed time notifications');
     }
 }
