@@ -316,9 +316,7 @@ class NotificationService
             ->get();
 
             Log::debug('User settings query result', [
-                'count' => $userSettings->count(),
-                'sql' => $userSettings->toSql(),
-                'bindings' => $userSettings->getBindings()
+                'count' => $userSettings->count()
             ]);
 
         // 各ユーザー設定に対して処理を実行
