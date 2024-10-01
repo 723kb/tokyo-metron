@@ -300,7 +300,7 @@ class NotificationService
         // 現在の曜日を小文字の英語で取得
         $dayOfWeek = strtolower($now->englishDayOfWeek);
 
-        Log::info('Processing fixed time notifications', [
+        Log::debug('Fixed time notification check', [
             'current_time' => $currentTime,
             'day_of_week' => $dayOfWeek
         ]);
@@ -315,8 +315,10 @@ class NotificationService
             ->with(['user.lineNotifyToken', 'line']) // 関連するユーザー、LINEトークン、路線情報も同時に取得
             ->get();
 
-            Log::info('Found user settings for fixed time notifications', [
-                'count' => $userSettings->count()
+            Log::debug('User settings query result', [
+                'count' => $userSettings->count(),
+                'sql' => $userSettings->toSql(),
+                'bindings' => $userSettings->getBindings()
             ]);
 
         // 各ユーザー設定に対して処理を実行
