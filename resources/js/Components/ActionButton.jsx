@@ -14,7 +14,7 @@ const ActionButton = ({ favorites }) => {
         return (
             <ActionLink
                 href={route("favorites.create")}
-                className="bg-blue-600 hover:bg-blue-400 text-white font-semibold"
+                className="font-semibold bg-blue-500 text-white hover:bg-blue-700 focus:bg-blue-500 active:bg-blue-700"
             >
                 <span className="block w-full">登録</span>
             </ActionLink>
@@ -25,7 +25,7 @@ const ActionButton = ({ favorites }) => {
     return (
         <ActionLink
             href={route("favorites.edit")}
-            className="bg-green-600 hover:bg-green-400 text-white font-semibold"
+            className="font-semibold bg-green-500 text-white hover:bg-green-700 focus:bg-green-500 active:bg-green-700"
         >
             <span className="block w-full">更新</span>
         </ActionLink>

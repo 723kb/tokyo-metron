@@ -42,7 +42,9 @@ const Header = () => {
     return (
         <header className="w-full bg-white shadow">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center py-2 sm:py-4"> {/* パディングを調整 */}
+                <div className="flex justify-between items-center py-2 sm:py-4">
+                    {" "}
+                    {/* パディングを調整 */}
                     <Logo isAuthenticated={isAuthenticated} />
                     {/* デスクトップナビゲーション */}
                     <div className="hidden md:flex items-center space-x-4">
@@ -50,7 +52,7 @@ const Header = () => {
                         {isAuthenticated ? (
                             <UserMenu user={auth.user} />
                         ) : (
-                            <AuthLinks />
+                            <AuthLinks spacing="space-x-4" />
                         )}
                     </div>
                     {/* モバイルメニューボタン */}

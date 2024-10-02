@@ -30,7 +30,7 @@ const FavoriteEdit = ({ lines = [], favoriteLineIds = [] }) => {
                             submitRoute="favorites.update" // フォーム送信先のルート名
                             submitMethod="put" // 更新のためPUTメソッドを使用
                             submitButtonText="更新" // 送信ボタンのテキスト
-                            submitButtonClass="bg-green-600 hover:bg-green-400 text-white font-semibold" // 送信ボタンのスタイル
+                            submitButtonClass="font-semibold bg-green-500 text-white hover:bg-green-700 focus:bg-green-500 active:bg-green-700" // 送信ボタンのスタイル
                         />
                     </div>
                 </div>

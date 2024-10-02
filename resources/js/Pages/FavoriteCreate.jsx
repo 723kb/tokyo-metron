@@ -28,7 +28,7 @@ const FavoriteCreate = ({ lines = [] }) => {
                             submitRoute="favorites.store" // フォーム送信先のルート名
                             submitMethod="post" // HTTP POSTメソッドを使用
                             submitButtonText="登録" // 送信ボタンのテキスト
-                            submitButtonClass="bg-indigo-600 hover:bg-indigo-400 text-white font-semibold" // 送信ボタンのスタイル
+                            submitButtonClass="font-semibold bg-blue-500 text-white hover:bg-blue-700 focus:bg-blue-500 active:bg-blue-700" // 送信ボタンのスタイル
                         />
                     </div>
                 </div>
