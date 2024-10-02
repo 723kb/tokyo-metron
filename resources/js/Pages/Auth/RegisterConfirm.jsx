@@ -96,7 +96,7 @@ export default function RegisterConfirm() {
                             <span>非表示にしています</span>
                         </div>
                     </div>
-                    <div className="flex items-center justify-around  mt-4">
+                    <div className="flex justify-center space-x-8 m-4">
                         <ActionLink
                             onClick={handleEdit}
                             className="font-semibold bg-gray-300 text-gray-800 hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-500"

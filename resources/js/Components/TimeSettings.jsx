@@ -12,56 +12,43 @@ import FormField from "@/Components/FormField";
  */
 const TimeSettings = ({ setting, index, handleChange }) => {
     return (
-        <>
-            <div className="mt-4">
-                <h3 className="font-semibold">時間設定</h3>
-                <div className="flex space-x-4">
-                    {/* 通知開始時間の入力フィールド */}
-                    <FormField
-                        type="time"
-                        label="開始時間"
-                        value={setting.notify_start_time}
-                        // 関数を呼び出して状態更新
-                        onChange={(e) =>
-                            handleChange(
-                                index,
-                                "notify_start_time",
-                                e.target.value,
-                            )  
-                        }
-                    />
-                    {/* 通知終了時間の入力フィールド */}
-                    <FormField
-                        type="time"
-                        label="終了時間"
-                        value={setting.notify_end_time}
-                        onChange={(e) =>
-                            handleChange(
-                                index,
-                                "notify_end_time",
-                                e.target.value,
-                            )
-                        }
-                    />
-                </div>
+        <div className="mt-4">
+            <h3 className="font-semibold mb-2">時間設定</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* 通知開始時間の入力フィールド */}
+                <FormField
+                    type="time"
+                    label="開始時間"
+                    value={setting.notify_start_time}
+                    onChange={(e) =>
+                        handleChange(index, "notify_start_time", e.target.value)
+                    }
+                    className="w-full"
+                />
+                {/* 通知終了時間の入力フィールド */}
+                <FormField
+                    type="time"
+                    label="終了時間"
+                    value={setting.notify_end_time}
+                    onChange={(e) =>
+                        handleChange(index, "notify_end_time", e.target.value)
+                    }
+                    className="w-full"
+                />
             </div>
-            <div className="mt-4">
+            <div>
                 {/* 必須通知時刻の入力フィールド */}
                 <FormField
                     type="time"
                     label="必須通知時刻"
                     value={setting.notify_fixed_time}
-                    onChange={
-                        (e) =>
-                            handleChange(
-                                index,
-                                "notify_fixed_time",
-                                e.target.value,
-                            )
+                    onChange={(e) =>
+                        handleChange(index, "notify_fixed_time", e.target.value)
                     }
+                    className="w-full"
                 />
             </div>
-        </>
+        </div>
     );
 };
 

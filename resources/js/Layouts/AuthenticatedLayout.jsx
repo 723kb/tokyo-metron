@@ -59,11 +59,11 @@ export default function Authenticated({
             </main>
             {/* メインページ以外で「戻る」「メインに戻る」ボタンを表示 */}
             {!isMainPage && (
-                <div className="flex justify-center space-x-20 my-4">
+                <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 my-4 px-4">
                     {!hideBackButton && (
                         <ActionLink
                             onClick={handleBack}
-                            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4"
+                            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 sm:mr-4"
                         >
                             <span className="block w-full">戻る</span>
                         </ActionLink>

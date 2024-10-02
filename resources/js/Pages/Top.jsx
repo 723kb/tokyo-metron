@@ -28,12 +28,12 @@ const Top = () => {
             {/* 機能説明 */}
             <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
                 <div className="px-4 py-5 sm:px-6">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    <h3 className="text-md sm:text-lg leading-6 font-medium text-gray-900">
                         ログインすると下記の機能が利用できます。
                     </h3>
                 </div>
-                <div className="border-t border-gray-200">
-                    <dl>
+                <div className="border-y border-gray-200">
+                    <dl className="divide-y divide-gray-200">
                         <div className="bg-gray-50 px-4 py-5 sm:px-6">
                             <dt className="text-sm font-medium text-gray-500">
                                 1. 全路線の運行状況がチェックできる！
@@ -58,9 +58,10 @@ const Top = () => {
                         </div>
                     </dl>
                 </div>
+                
                 {/* アクションボタン */}
                 <div className="flex justify-center space-x-4 m-4">
-                    <AuthLinks />
+                    <AuthLinks spacing="space-x-4 sm:space-x-8" />
                 </div>
 
                 {/* 運行状況 */}

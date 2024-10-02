@@ -78,7 +78,7 @@ const FavoriteList = ({ favorites, initialMessage }) => {
             <Head title="お気に入り一覧" />
             
             <div className="py-2 sm:py-12">
-                <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div className="bg-white overflow-hidden shadow-sm rounded-lg">
                     <div className="p-6 mb-4 bg-white border-b border-gray-200">
                         {/* お気に入り機能実行後に表示するメッセージ */}
                         {flashMessage && (

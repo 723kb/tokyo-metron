@@ -7,6 +7,7 @@ import LineNotifyConnection from "@/Components/LineNotifyConnection";
 import NotificationSettingsForm from "@/Components/NotificationSettingsForm";
 import { useFlashMessage } from "@/hooks/useFlashMessage";
 import { useLineNotifyConnection } from "@/hooks/useLineNotifyConnection";
+import NotificationTypeExplanation from "@/Components/NotificationTypeExplanation";
 
 /**
  * 通知設定ページのコンポーネント
@@ -86,7 +87,7 @@ const NotificationSettings = ({
         <Authenticated>
             <Head title="通知設定" />
             <div className="py-12">
-                <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div className="bg-white overflow-hidden shadow-sm rounded-lg">
                     <div className="p-6 bg-white border-b border-gray-200">
                         <h1 className="text-2xl font-bold mb-4">通知設定</h1>
 
@@ -105,6 +106,9 @@ const NotificationSettings = ({
                             />
                         )}
 
+                        {/* 通知タイプの説明 */}
+                        <NotificationTypeExplanation />
+
                         {/* LINE Notify連携コンポーネント */}
                         <LineNotifyConnection
                             isConnected={localIsLineConnected}
@@ -116,7 +120,7 @@ const NotificationSettings = ({
                             // お気に入り路線がない場合、メッセージを表示
                             <div className="mb-4 p-4 border rounded">
                                 <p className="text-lg">
-                                    通知設定をするには路線のお気に入り登録が必要です
+                                    通知設定をするには路線のお気に入り登録が必要です。
                                 </p>
                             </div>
                         ) : (

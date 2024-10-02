@@ -27,22 +27,35 @@ const DayCheackboxes = ({ setting, index, handleChange }) => {
     ];
 
     return (
-        <div className="mt-4">
-            <h3 className="font-semibold">曜日設定</h3>
-            <div className="flex flex-wrap justify-around">
+        <div className="mt-4 space-y-2 sm:space-y-4">
+            <h3 className="font-semibold mb-2">曜日設定</h3>
+            <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
                 {daysOfWeek.map((day) => (
-                    <FormField
+                    <div
                         key={day.key}
-                        id={`${setting.id}-${day.key}`} // 各チェックボックスに一意のIDを割り当て
-                        type="checkbox"
-                        label={day.label}
-                        value={setting[day.key]} // 各曜日の設定値をチェックボックスに反映
-                        onChange={(e) =>
-                            handleChange(index, day.key, e.target.checked)
-                        } // チェックボックスの状態変更をhandleChange関数に渡す
-                        className="mr-1 p-2"
-                        labelClassName="ml-1"
-                    />
+                        className="flex items-center justify-center"
+                    >
+                        <FormField
+                            id={`${setting.id}-${day.key}`} // 各チェックボックスに一意のIDを割り当て
+                            type="checkbox"
+                            value={setting[day.key]} // 各曜日の設定値をチェックボックスに反映
+                            onChange={(e) =>
+                                handleChange(index, day.key, e.target.checked)
+                            } // チェックボックスの状態変更をhandleChange関数に渡す
+                            className="sr-only"
+                        />
+                        <label
+                            htmlFor={`${setting.id}-${day.key}`}
+                            className={`w-10 h-10 flex items-center justify-center rounded-full cursor-pointer text-sm
+                            ${
+                                setting[day.key]
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-200 text-gray-700"
+                            }`}
+                        >
+                            {day.label}
+                        </label>
+                    </div>
                 ))}
             </div>
         </div>
