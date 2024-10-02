@@ -5,7 +5,7 @@ import { Head } from "@inertiajs/react";
 
 const MyPage = () => {
     return (
-        <Authenticated>
+        <Authenticated hideBackButton={true}>
             <Head title="マイページ" />
 
             <div className="py-2 sm:py-12">

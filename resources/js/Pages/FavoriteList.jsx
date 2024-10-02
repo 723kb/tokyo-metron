@@ -74,7 +74,7 @@ const FavoriteList = ({ favorites, initialMessage }) => {
     };
 
     return (
-        <Authenticated>
+        <Authenticated backUrl="/mypage">
             <Head title="お気に入り一覧" />
             
             <div className="py-2 sm:py-12">

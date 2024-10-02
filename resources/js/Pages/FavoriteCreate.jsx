@@ -12,7 +12,7 @@ import FavoriteForm from "@/Components/FavoriteForm";
  */
 const FavoriteCreate = ({ lines = [] }) => {
     return (
-        <Authenticated>
+        <Authenticated backUrl="/favorites">
             <Head title="お気に入り登録" />
 
             <div className="py-2 sm:py-12">

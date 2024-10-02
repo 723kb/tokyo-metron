@@ -38,10 +38,12 @@ const NotificationSettingsForm = ({
                     handleToggle={onToggle}
                 />
             ))}
+            <div className="flex justify-center">
             {/* 設定保存ボタン */}
             <ActionLink onClick={onSubmit} disabled={processing}>
-                設定を保存
+                <span className="block w-full">設定を保存</span>
             </ActionLink>
+            </div>
         </form>
     );
 };

@@ -14,7 +14,7 @@ import FavoriteForm from "@/Components/FavoriteForm";
  */
 const FavoriteEdit = ({ lines = [], favoriteLineIds = [] }) => {
     return (
-        <Authenticated>
+        <Authenticated backUrl="/favorites">
             <Head title="お気に入り更新" />
 
             <div className="py-2 sm:py-12">
