@@ -59,7 +59,7 @@ export default function Authenticated({
             </main>
             {/* メインページ以外で「戻る」「メインに戻る」ボタンを表示 */}
             {!isMainPage && (
-                <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 my-4 px-4">
+                <div className="flex flex-row items-center justify-center space-x-8 my-4 px-4">
                     {!hideBackButton && (
                         <ActionLink
                             onClick={handleBack}
