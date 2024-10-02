@@ -42,20 +42,20 @@ export default function Authenticated({ children }) {
                         />
                     )}
                     {children}
-                    {/* メインページ以外で「戻る」「メインに戻る」ボタンを表示 */}
-                    {!isMainPage && (
-                        <div className="flex justify-center my-4">
-                            <ActionLink
-                                onClick={() => window.history.back()}
-                                className="bg-indigo-200 hover:bg-indigo-300 focus:bg-indigo-300 active:bg-indigo-400 mr-4 font-normal"
-                            >
-                                戻る
-                            </ActionLink>
-                            <NavigationButton isAuthenticated={true} />
-                        </div>
-                    )}
                 </div>
             </main>
+            {/* メインページ以外で「戻る」「メインに戻る」ボタンを表示 */}
+            {!isMainPage && (
+                <div className="flex justify-center my-4">
+                    <ActionLink
+                        onClick={() => window.history.back()}
+                        className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4"
+                    >
+                        <span className="block w-full">戻る</span>
+                    </ActionLink>
+                    <NavigationButton isAuthenticated={true} />
+                </div>
+            )}
             <Footer />
         </div>
     );

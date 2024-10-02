@@ -12,23 +12,22 @@ import NavigationButton from "@/Components/NavigationButton";
  * @returns {JSX.Element} ゲストレイアウトを含むReactコンポーネント
  */
 export default function GuestLayout({ children }) {
-    
     /**
      * 現在のURLを取得
      *
      * @type {string}
      */
     const { url } = usePage();
-    
+
     /**
      * TOPページか判断
      *
      * @type {boolean}
      */
-    const isTopPage = url === "/"; 
+    const isTopPage = url === "/";
 
     /**
-    * ユーザーが認証されているかどうかを判断
+     * ユーザーが認証されているかどうかを判断
      *
      * authオブジェクトのuserプロパティがnullでない場合 = 認証済み
      *
@@ -46,19 +45,15 @@ export default function GuestLayout({ children }) {
                         subtitle="東京メトロ運行状況共有サービス"
                         imageSrc="/images/Hero.png"
                     />
-                    
-                        {children}
-                    
-                    {/* トップページ以外でナビゲーションボタンを表示 */}
-                    {!isTopPage && (
-                        <div className="flex justify-center mt-4">
-                            <NavigationButton
-                                isAuthenticated={isAuthenticated}
-                            />
-                        </div>
-                    )}
+                    {children}
                 </div>
             </main>
+            {/* トップページ以外でナビゲーションボタンを表示 */}
+            {!isTopPage && (
+                <div className="flex justify-center my-4">
+                    <NavigationButton isAuthenticated={isAuthenticated} />
+                </div>
+            )}
             <Footer />
         </div>
     );

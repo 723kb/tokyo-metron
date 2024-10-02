@@ -24,8 +24,8 @@ const MobileMenu = ({ isAuthenticated, auth }) => {
                 <>
                     {/* ログイン済みユーザー向けのメニュー項目 */}
                     <ResponsiveNavLink
-                        href={route("profile.edit")}
-                        active={route().current("profile.edit")}
+                        href={route("mypage.index")}
+                        active={route().current("mypage.index")}
                     >
                         マイページ
                     </ResponsiveNavLink>

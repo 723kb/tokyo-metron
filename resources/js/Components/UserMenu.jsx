@@ -33,8 +33,8 @@ const UserMenu = ({ user }) => {
 
             {/* ドロップダウンの内容 */}
             <Dropdown.Content>
-                {/* マイページへのリンク とりあえず仮リンク*/}
-                <Dropdown.Link href={route("profile.edit")}>
+                {/* マイページへのリンク */}
+                <Dropdown.Link href={route("mypage.index")}>
                     マイページ
                 </Dropdown.Link>
                 {/* ログアウトリンク */}

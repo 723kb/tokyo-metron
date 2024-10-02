@@ -70,7 +70,7 @@ class User extends Authenticatable
     /**
      * ユーザーの路線設定を取得
      */
-    public function lineSettings()
+    public function userLineSettings()
     {
         return $this->hasMany(UserLineSetting::class);
     }

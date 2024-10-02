@@ -7,6 +7,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
+import FormField from "@/Components/FormField";
 
 export default function Login({ status, canResetPassword }) {
     const { t } = useTranslation();
@@ -39,43 +40,27 @@ export default function Login({ status, canResetPassword }) {
             )}
             <div className="w-full sm:max-w-md mx-auto mt-10 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <form onSubmit={submit}>
-                    <div>
-                        <InputLabel htmlFor="email" value={t("email")} />
 
-                        <TextInput
-                            id="email"
-                            type="email"
-                            name="email"
-                            value={data.email}
-                            className="mt-1 block w-full"
-                            autoComplete="username"
-                            isFocused={true}
-                            onChange={(e) => setData("email", e.target.value)}
-                        />
+                        <FormField
+                        id="email"
+                        label={t("Email")}
+                        type="email"
+                        value={data.email}
+                        onChange={(e) => setData("email", e.target.value)}
+                        error={errors.email}
+                        placeholder="example@example.com"
+                    />
 
-                        <InputError message={errors.email} className="mt-2" />
-                    </div>
 
-                    <div className="mt-4">
-                        <InputLabel htmlFor="password" value={t("password")} />
-
-                        <TextInput
-                            id="password"
-                            type="password"
-                            name="password"
-                            value={data.password}
-                            className="mt-1 block w-full"
-                            autoComplete="current-password"
-                            onChange={(e) =>
-                                setData("password", e.target.value)
-                            }
-                        />
-
-                        <InputError
-                            message={errors.password}
-                            className="mt-2"
-                        />
-                    </div>
+                        <FormField
+                        id="password"
+                        label="パスワード(半角英数8文字以上)"
+                        type="password"
+                        value={data.password}
+                        onChange={(e) => setData("password", e.target.value)}
+                        error={errors.password}
+                        placeholder="Password123"
+                    />
 
                     <div className="block mt-4">
                         <label className="flex items-center">

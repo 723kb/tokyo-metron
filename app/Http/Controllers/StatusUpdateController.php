@@ -82,17 +82,18 @@ class StatusUpdateController extends Controller
 
     /**
      * 特定の運行状況投稿の詳細を表示する
+     * 
+     * コメントの作成、更新、削除はCommentControllerで行う。
      */
     public function show($lineId, $postId)
     {
         $line = Line::findOrFail($lineId);
-        $statusUpdate = $line->statusUpdates()->findOrFail($postId);
-        $comments = $statusUpdate->comments()->with('user')->get();
+        $statusUpdate = $line->statusUpdates()->with(['comments.user'])->findOrFail($postId);
     
         return Inertia::render('LinePostDetail', [
             'line' => $line,
             'statusUpdate' => $statusUpdate,
-            'comments' => $comments
+            'comments' => $statusUpdate->comments
         ]);
     }
 
