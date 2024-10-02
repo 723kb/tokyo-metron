@@ -51,9 +51,31 @@ const FavoriteForm = ({
      * @param {number} lineId - 変更された路線のID
      */
     const handleCheckboxChange = (lineId) => {
-        const updatedLines = data.selectedLines.includes(lineId) // 変更された路線IDが既に選択されているかチェック
-            ? data.selectedLines.filter((id) => id !== lineId) // チェックが外れた時：lineId以外の全ての要素を含む新しい配列を作成 = 配列から削除
-            : [...data.selectedLines, lineId]; // チェックされた時：現在のselectedLines配列の全要素をコピー→新しいlineIdを追加した新しい配列を作成
+        // 路線が既に選択されているかどうかを確認
+        const isAlreadySelected = data.selectedLines.includes(lineId);
+
+        /**
+         * 選択された路線を配列から削除する関数
+         * @returns {number[]} 更新された選択路線の配列
+         */
+        const removeLineFromSelection = () => {
+            return data.selectedLines.filter((id) => id !== lineId);
+        };
+
+        /**
+         * 新しい路線を選択配列に追加する関数
+         * @returns {number[]} 更新された選択路線の配列
+         */
+        const addLineToSelection = () => {
+            return [...data.selectedLines, lineId];
+        };
+
+        // 路線の選択状態に応じて、適切な処理を実行
+        const updatedLines = isAlreadySelected
+            ? removeLineFromSelection()
+            : addLineToSelection();
+
+        // 更新された選択路線の配列をステートにセット
         setData("selectedLines", updatedLines);
     };
 
@@ -90,7 +112,7 @@ const FavoriteForm = ({
                     disabled={processing}
                     className={submitButtonClass}
                 >
-                    {submitButtonText}
+                    <span className="block w-full">{submitButtonText}</span>
                 </ActionLink>
             </div>
         </form>

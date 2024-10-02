@@ -9,16 +9,17 @@ import ActionLink from "@/Components/ActionLink";
  * @param {number} props.lineId - 路線ID
  * @param {number} props.postId - 投稿ID
  * @param {Function} props.onCommentAdded - コメント追加後のコールバック関数
+ * @param {Function} props.onCancel - キャンセルボタンクリック時のコールバック関数
  * @returns {JSX.Element} コメントフォーム
  */
-const CommentForm = ({ lineId, postId, onCommentAdded }) => {
+const CommentForm = ({ lineId, postId, onCommentAdded, onCancel }) => {
     const { data, setData, post, processing, errors, reset } = useForm({
         content: "",
     });
 
     /**
      * フォーム送信処理
-     * 
+     *
      * @param {Event} e - フォーム送信イベント
      */
     const submit = (e) => {
@@ -45,9 +46,19 @@ const CommentForm = ({ lineId, postId, onCommentAdded }) => {
             {errors.content && (
                 <div className="text-red-500">{errors.content}</div>
             )}
-            <div className="mt-4">
-                <ActionLink onClick={submit} disabled={processing} className="bg-gray-600 hover:bg-gray-400 text-white font-semibold">
-                    投稿
+            <div className="mt-2 space-x-6 flex">
+                <ActionLink
+                    onClick={onCancel}
+                    className="bg-white border border-gray-400 text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-500 font-semibold py-2 px-4 rounded transition duration-150 ease-in-out"
+                >
+                    <span className="block w-full">キャンセル</span>
+                </ActionLink>
+                <ActionLink
+                    onClick={submit}
+                    disabled={processing}
+                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
+                >
+                    <span className="block w-full">投稿する</span>
                 </ActionLink>
             </div>
         </form>

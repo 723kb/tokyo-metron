@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "@inertiajs/react";
+import ActionLink from "./ActionLink";
 
 /**
  * ナビゲーションボタンコンポーネント
@@ -12,13 +13,14 @@ import { Link } from "@inertiajs/react";
  * @returns {JSX.Element} 認証状態に応じたナビゲーションボタン
  */
 const NavigationButton = ({ isAuthenticated }) => (
-    <Link
+    <ActionLink
         href={isAuthenticated ? route("main") : route("top")}
-        className="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md  uppercase tracking-widest hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+        className="bg-gray-100 border border-gray-300 text-gray-800 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 inline-flex items-center px-4 py-2 rounded-md uppercase tracking-widest transition ease-in-out duration-150"
     >
-        {/* 認証状態に応じてテキストを変更 */}
-        {isAuthenticated ? "メインに戻る" : "トップに戻る"}
-    </Link>
+        <span className="block w-full">
+            {isAuthenticated ? "メインに戻る" : "トップに戻る"}
+        </span>
+    </ActionLink>
 );
 
 export default NavigationButton;

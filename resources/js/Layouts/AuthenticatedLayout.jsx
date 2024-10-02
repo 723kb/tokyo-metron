@@ -49,9 +49,9 @@ export default function Authenticated({ children }) {
                 <div className="flex justify-center my-4">
                     <ActionLink
                         onClick={() => window.history.back()}
-                        className="bg-gray-800 hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-500 text-white mr-4 "
+                        className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4"
                     >
-                        戻る
+                        <span className="block w-full">戻る</span>
                     </ActionLink>
                     <NavigationButton isAuthenticated={true} />
                 </div>

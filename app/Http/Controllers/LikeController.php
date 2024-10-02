@@ -28,7 +28,7 @@ class LikeController extends Controller
         return response()->json([
             'is_liked' => $isLiked,
             'likes_count' => $likesCount
-        ]);
+        ], 200); // 200 OK
     }
 
     /**
@@ -54,7 +54,10 @@ class LikeController extends Controller
                 'comment_id' => $comment->id,
             ]);
             // 成功レスポンスを返す（いいね数も含む）
-            return response()->json(['message' => 'いいねしました', 'likes_count' => $comment->likes()->count()]);
+            return response()->json([
+                'message' => 'いいねしました',
+                'likes_count' => $comment->likes()->count()
+            ], 201); // 201 Created
         }
 
         // すでにいいねしている場合は409 Conflictエラーを返す
@@ -81,7 +84,10 @@ class LikeController extends Controller
             // いいねが存在する場合、削除する
             $like->delete();
             // 成功レスポンスを返す（更新後のいいね数も含む）
-            return response()->json(['message' => 'いいねを取り消しました', 'likes_count' => $comment->likes()->count()]);
+            return response()->json([
+                'message' => 'いいねを取り消しました',
+                'likes_count' => $comment->likes()->count()
+            ], 200); // 200 OK
         }
 
         // いいねが見つからない場合は404 Not Foundエラーを返す
