@@ -1,66 +1,84 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ①課題番号-プロダクト名
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+トーキョーめとろん
 
-## About Laravel
+## ②課題内容（どんな作品か）
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+#### 東京メトロの運行状況を**LINE通知**できるアプリ。
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- ログインすることで各路線の運行状況に対してコメントすることができる。
+- コメントにはいいねをつけることができる。
+- お気に入りに登録した路線は通知設定を行うことで、通知を受け取ることができる。
+- 通知は以下の2種類。
+1. **時間帯通知**
+   - 指定された時間内に運行状況に変化があれば、最新の運行状況を通知する。
+   - 変化がない場合は通知されない。
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. **必須通知**
+   - 指定された時間の運行状況を必ず通知する。
+   - 遅延などがない場合でも通知が行われる。
 
-## Learning Laravel
+| 通知タイプ | 説明 | 通知のタイミング |
+|------------|------|------------------|
+| 時間帯通知 | 運行状況の変化を通知 | 指定時間内で変化があった時のみ |
+| 必須通知   | 運行状況を必ず通知   | 指定時間に必ず |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## ③DEMO
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+https://723kb.jp/
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ④作ったアプリケーション用のIDまたはPasswordがある場合
 
-## Laravel Sponsors
+企画書フォームに記載しているため割愛。
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## ⑤工夫した点・こだわった点
 
-### Premium Partners
+- 使用頻度の高いLINEに通知されるようLINE Notifyと連携した。
+- APIへアクセスするタイミングやDBからデータを削除する等、Laravelのスケジュール機能を活用した。
+- フロントはBladeではなくInertia.jsを使用し、Laravelプロダクト内でReactで制作した。
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## ⑥難しかった点・次回トライしたいこと(又は機能)
 
-## Contributing
+1. **Laravel の学習曲線**
+   - 基本的な知識不足により、何をするにしても苦しんだ。
+   - 日々の学習で徐々に理解が深まったが、さらなる復習が必要。
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **React と Inertia.js の組み合わせ**
+   - React 単体だけでなく、Inertia.js の知識も必要で苦しんだ。
 
-## Code of Conduct
+3. **設計の難しさ**
+   - DB設計や画面設計に時間をかけたが、多くの変更が必要となり設計の難しさを痛感した。
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. **API 連携の複雑さ**
+   - 2種類の API を使用したが、連携プロセスの理解に苦労した。
+   - API についてより体系的な学習が必要。
 
-## Security Vulnerabilities
+### 未実装・修正点
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- メールアドレス検証の強化：実在するアドレスのみ登録可能に
+- パスワードリセット機能：Mailpit を使用したリセットメール送信
+- LINE Notify 連携ボタンの表示制御の改善
+- コードのリファクタリング
+  - 長いコードの整理
+  - コンポーネントの単一責任原則に基づく再構成
 
-## License
+### 今後の展望
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. TypeScript への移行
+2. SMS 認証によるログイン機能の実装
+3. 都営地下鉄への対応拡大
+
+## ⑦質問・疑問・感想、シェアしたいこと等なんでも
+
+- 最初から最後までLaravelが苦しかった。フレームワークを使うメリットがわからなかったが、スケジュール機能を使い出したあたりから便利さに気づき、もっと使いこなせるようになりたいと思った。
+- さくらサーバー（結局失敗に終わる）、LightSailどちらでもデプロイできるようになり良い経験であった。<br>ドメインの当て方やHTTPS化を自分の力でできたことが自信につながった。
+
+### 使用技術
+
+| カテゴリ | 技術/サービス |
+|---------|--------------|
+| バックエンド | PHP (Laravel) |
+| フロントエンド | React |
+| データベース | MySQL |
+| フレームワーク連携 | Inertia.js |
+| 外部サービス | 公共交通オープンデータAPI (ODPT API), LINE Notify API |
