@@ -6,25 +6,28 @@ import FormField from "@/Components/FormField";
 /**
  * お気に入り路線のフォームコンポーネント
  *
- * お気に入り路線の登録と編集の両方に使用。
+ * ユーザーがお気に入りの路線を選択・編集するためのフォーム。
+ * 新規登録と編集の両方のモードに対応しており、isEditプロパティによって動作が切り替わる。
+ *
  * @param {Object} props コンポーネントのプロパティ
- * @param {Array} props.lines 選択可能な路線のリスト
- * @param {Array} props.initialSelectedLines 初期状態で選択されている路線のIDリスト
- * @param {string} props.submitRoute フォーム送信先のルート名
- * @param {string} props.submitMethod 送信に使用するHTTPメソッド（'post'または'put'）
- * @param {string} props.submitButtonText 送信ボタンに表示するテキスト
- * @param {string} props.submitButtonClass 送信ボタンに適用するCSSクラス
+ * @param {Array<Object>} props.lines 選択可能な路線のリスト。各オブジェクトは{id, name, color_code}を含む
+ * @param {Array<number>} [props.initialSelectedLines=[]] 初期状態で選択されている路線のIDリスト
+ * @param {boolean} [props.isEdit=false] 編集モードかどうか。trueの場合、更新用のUIが表示される
  * @returns {JSX.Element} フォームコンポーネント
  */
-const FavoriteForm = ({
-    lines,
-    initialSelectedLines,
-    submitRoute,
-    submitMethod,
-    submitButtonText,
-    submitButtonClass,
-}) => {
-    // useFormフックを使用してフォームの状態を管理
+const FavoriteForm = ({ lines, initialSelectedLines = [], isEdit = false }) => {
+    // フォームの送信先とメソッドを決定
+    const submitRoute = isEdit ? "favorites.update" : "favorites.store";
+    const submitMethod = isEdit ? "put" : "post";
+    const submitButtonText = isEdit ? "更新" : "登録";
+    const submitButtonClass = isEdit
+        ? "font-semibold bg-green-500 text-white hover:bg-green-700 focus:bg-green-500 active:bg-green-700"
+        : "font-semibold bg-blue-500 text-white hover:bg-blue-700 focus:bg-blue-500 active:bg-blue-700";
+
+    /**
+     * useFormフックを使用してフォームの状態を管理
+     * @type {Object} フォームの状態と操作メソッドを含むオブジェクト
+     */
     const {
         data,
         setData,
@@ -36,8 +39,7 @@ const FavoriteForm = ({
     });
 
     /**
-     * フォーム送信時の処理
-     *
+     * フォーム送信時のハンドラー
      * @param {Event} e - フォーム送信イベント
      */
     const handleSubmit = (e) => {
@@ -46,36 +48,15 @@ const FavoriteForm = ({
     };
 
     /**
-     * チェックボックスの状態変更時の処理
-     *
+     * チェックボックスの状態変更時のハンドラー
+     * 選択された路線のIDを追加または削除します
      * @param {number} lineId - 変更された路線のID
      */
     const handleCheckboxChange = (lineId) => {
-        // 路線が既に選択されているかどうかを確認
         const isAlreadySelected = data.selectedLines.includes(lineId);
-
-        /**
-         * 選択された路線を配列から削除する関数
-         * @returns {number[]} 更新された選択路線の配列
-         */
-        const removeLineFromSelection = () => {
-            return data.selectedLines.filter((id) => id !== lineId);
-        };
-
-        /**
-         * 新しい路線を選択配列に追加する関数
-         * @returns {number[]} 更新された選択路線の配列
-         */
-        const addLineToSelection = () => {
-            return [...data.selectedLines, lineId];
-        };
-
-        // 路線の選択状態に応じて、適切な処理を実行
         const updatedLines = isAlreadySelected
-            ? removeLineFromSelection()
-            : addLineToSelection();
-
-        // 更新された選択路線の配列をステートにセット
+            ? data.selectedLines.filter((id) => id !== lineId)
+            : [...data.selectedLines, lineId];
         setData("selectedLines", updatedLines);
     };
 
@@ -85,7 +66,7 @@ const FavoriteForm = ({
                 <p className="block font-medium text-gray-700 mb-2 text-center">
                     路線を選択してください。すでに登録済みのものにはチェックが入っています。
                 </p>
-                {/* 路線のリストをマップして各路線のチェックボックスを表示 */}
+                {/* 各路線のチェックボックスを生成 */}
                 {lines.map((line) => (
                     <FormField
                         key={line.id}
@@ -106,7 +87,7 @@ const FavoriteForm = ({
                 )}
             </div>
             <div className="flex justify-center">
-                {/* 登録ボタン or 編集ボタン */}
+                {/* 送信ボタン */}
                 <ActionLink
                     onClick={handleSubmit}
                     disabled={processing}

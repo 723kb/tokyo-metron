@@ -25,12 +25,9 @@ const FavoriteEdit = ({ lines = [], favoriteLineIds = [] }) => {
                         </h1>
                         {/* FavoriteFormコンポーネントを使用してフォームを表示 */}
                         <FavoriteForm
-                            lines={lines} // 選択可能な全路線のリスト
-                            initialSelectedLines={favoriteLineIds} // 初期状態で選択されている路線のID
-                            submitRoute="favorites.update" // フォーム送信先のルート名
-                            submitMethod="put" // 更新のためPUTメソッドを使用
-                            submitButtonText="更新" // 送信ボタンのテキスト
-                            submitButtonClass="font-semibold bg-green-500 text-white hover:bg-green-700 focus:bg-green-500 active:bg-green-700" // 送信ボタンのスタイル
+                            lines={lines}
+                            initialSelectedLines={favoriteLineIds}
+                            isEdit={true}
                         />
                     </div>
                 </div>

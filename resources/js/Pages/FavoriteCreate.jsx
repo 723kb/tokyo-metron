@@ -22,14 +22,7 @@ const FavoriteCreate = ({ lines = [] }) => {
                             お気に入り登録
                         </h1>
                         {/* FavoriteFormコンポーネントを使用してフォームを表示 */}
-                        <FavoriteForm
-                            lines={lines} // 選択可能な路線のリスト
-                            initialSelectedLines={[]} // 初期状態では何も選択されていない
-                            submitRoute="favorites.store" // フォーム送信先のルート名
-                            submitMethod="post" // HTTP POSTメソッドを使用
-                            submitButtonText="登録" // 送信ボタンのテキスト
-                            submitButtonClass="font-semibold bg-blue-500 text-white hover:bg-blue-700 focus:bg-blue-500 active:bg-blue-700" // 送信ボタンのスタイル
-                        />
+                        <FavoriteForm lines={lines} />
                     </div>
                 </div>
             </div>
