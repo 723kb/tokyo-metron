@@ -84,8 +84,9 @@ const NotificationSettings = ({
     };
 
     return (
-        <Authenticated>
+        <Authenticated backUrl="/mypage">
             <Head title="通知設定" />
+            
             <div className="py-12">
                 <div className="bg-white overflow-hidden shadow-sm rounded-lg">
                     <div className="p-6 bg-white border-b border-gray-200">
