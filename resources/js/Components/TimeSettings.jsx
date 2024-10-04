@@ -1,5 +1,5 @@
 import React from "react";
-import FormField from "@/Components/FormField";
+import InputField from "./InputField";
 
 /**
  * 通知の時間設定を管理するコンポーネント
@@ -16,7 +16,7 @@ const TimeSettings = ({ setting, index, handleChange }) => {
             <h3 className="font-semibold mb-2">時間設定</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* 通知開始時間の入力フィールド */}
-                <FormField
+                <InputField
                     type="time"
                     label="開始時間"
                     value={setting.notify_start_time}
@@ -26,7 +26,7 @@ const TimeSettings = ({ setting, index, handleChange }) => {
                     className="w-full"
                 />
                 {/* 通知終了時間の入力フィールド */}
-                <FormField
+                <InputField
                     type="time"
                     label="終了時間"
                     value={setting.notify_end_time}
@@ -38,7 +38,7 @@ const TimeSettings = ({ setting, index, handleChange }) => {
             </div>
             <div>
                 {/* 必須通知時刻の入力フィールド */}
-                <FormField
+                <InputField
                     type="time"
                     label="必須通知時刻"
                     value={setting.notify_fixed_time}

@@ -3,8 +3,8 @@ import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
 import ErrorDisplay from "@/Components/ErrorDisplay";
-import FormField from "@/Components/FormField";
 import ActionLink from "@/Components/ActionLink";
+import InputField from "@/Components/InputField";
 
 /**
  * 会員登録フォームコンポーネント
@@ -128,7 +128,7 @@ export default function Register() {
                 <form onSubmit={submit}>
                     <ErrorDisplay message={globalError} />
 
-                    <FormField
+                    <InputField
                         id="name"
                         label={t("Name")}
                         value={data.name}
@@ -137,7 +137,7 @@ export default function Register() {
                         placeholder="めとろん"
                     />
 
-                    <FormField
+                    <InputField
                         id="email"
                         label={t("Email")}
                         type="email"
@@ -147,7 +147,7 @@ export default function Register() {
                         placeholder="example@example.com"
                     />
 
-                    <FormField
+                    <InputField
                         id="password"
                         label="パスワード(半角英数8文字以上)"
                         type="password"
@@ -157,7 +157,7 @@ export default function Register() {
                         placeholder="Password123"
                     />
 
-                    <FormField
+                    <InputField
                         id="password_confirmation"
                         label={t("Confirm Password")}
                         type="password"

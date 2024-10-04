@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "@inertiajs/react";
 import ActionLink from "@/Components/ActionLink";
-import FormField from "@/Components/FormField";
+import CheckboxField from "./CheckboxField";
 
 /**
  * お気に入り路線のフォームコンポーネント
@@ -68,11 +68,12 @@ const FavoriteForm = ({ lines, initialSelectedLines = [], isEdit = false }) => {
                 </p>
                 {/* 各路線のチェックボックスを生成 */}
                 {lines.map((line) => (
-                    <FormField
+                    <CheckboxField
                         key={line.id}
                         id={`line-${line.id}`}
                         label={line.name}
                         type="checkbox"
+                        checked={data.selectedLines.includes(line.id)}
                         value={data.selectedLines.includes(line.id)}
                         onChange={() => handleCheckboxChange(line.id)}
                         style={{ backgroundColor: line.color_code }}

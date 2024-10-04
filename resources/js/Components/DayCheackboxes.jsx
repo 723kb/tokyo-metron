@@ -1,5 +1,4 @@
 import React from "react";
-import FormField from "@/Components/FormField";
 
 /**
  * 曜日のチェックボックスを表示するコンポーネント
@@ -35,7 +34,7 @@ const DayCheackboxes = ({ setting, index, handleChange }) => {
                         key={day.key}
                         className="flex items-center justify-center"
                     >
-                        <FormField
+                        <input
                             id={`${setting.id}-${day.key}`} // 各チェックボックスに一意のIDを割り当て
                             type="checkbox"
                             value={setting[day.key]} // 各曜日の設定値をチェックボックスに反映

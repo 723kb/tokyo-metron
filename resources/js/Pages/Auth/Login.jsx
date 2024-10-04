@@ -3,8 +3,8 @@ import Checkbox from "@/Components/Checkbox";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
-import FormField from "@/Components/FormField";
 import ActionLink from "@/Components/ActionLink";
+import InputField from "@/Components/InputField";
 
 export default function Login({ status, canResetPassword }) {
     const { t } = useTranslation();
@@ -37,7 +37,7 @@ export default function Login({ status, canResetPassword }) {
             )}
             <div className="w-full sm:max-w-2xl mx-auto mt-10 md:mt-20 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <form onSubmit={submit}>
-                    <FormField
+                    <InputField
                         id="email"
                         label={t("Email")}
                         type="email"
@@ -47,7 +47,7 @@ export default function Login({ status, canResetPassword }) {
                         placeholder="example@example.com"
                     />
 
-                    <FormField
+                    <InputField
                         id="password"
                         label="パスワード(半角英数8文字以上)"
                         type="password"
