@@ -234,7 +234,7 @@ class NotificationService
                 // 前回の通知と今回の通知の状態、内容、更新時間を比較
                 $lastNotification['status'] == $status->status &&
                 $lastNotification['content'] == $status->content  &&
-                Carbon::parse($lastNotification['updated_at'])->diffInMinutes(now()) < 6  // 6時間重複チェックする
+                Carbon::parse($lastNotification['updated_at'])->diffInMinutes(now()) < 360  // 6時間重複チェックする
             ) {
                 Log::info('Skipping duplicate notification', [
                     'user_id' => $setting->user_id,
