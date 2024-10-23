@@ -19,5 +19,5 @@ export const useFlashMessage = (flashMessage, setMessage) => {
             // クリーンアップ関数：コンポーネントのアンマウント時やdependenciesが変更された時にタイマーをクリア
             return () => clearTimeout(timer);
         }
-    }, [flashMessage, setMessage]); // flashMessageまたはsetMessageが変更された時に再実行
+    }, [flashMessage]); // flashMessageが変更された時に再実行
 };

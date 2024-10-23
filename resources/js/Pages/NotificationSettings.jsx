@@ -38,14 +38,10 @@ const NotificationSettings = ({
     // カスタムフックを使用して通知設定の状態と操作関数を取得
     const {
         data,
-        processing,
         message: hookMessage,
         setMessage,
         isChanged, // 変更を追跡するフラグ
         isSubmitting,
-        handleChange,
-        handleToggle,
-        handleSubmit: originalHandleSubmit, // 元の送信ハンドラ
     } = useNotificationSettings(userLineSettings);
 
     // フラッシュメッセージ処理用カスタムフック
@@ -59,18 +55,6 @@ const NotificationSettings = ({
     const hasFavoriteLines = data.userLineSettings.some(
         (setting) => setting.favorite_flag === 1,
     );
-
-    /**
-     * 設定送信ハンドラ
-     * 設定保存が成功した場合、LINE Notify連携状態を更新する
-     */
-    const handleSubmit = async (e) => {
-        const result = await originalHandleSubmit(e);
-        // 設定保存が成功した場合、LINE Notify連携状態を更新
-        if (result && result.success) {
-            setIsLineConnected(true);
-        }
-    };
 
     /**
      * LINE Notify連携解除ハンドラ
@@ -127,13 +111,12 @@ const NotificationSettings = ({
                         ) : (
                             // お気に入り路線がある場合、設定フォームを表示
                             <NotificationSettingsForm
-                                settings={data.userLineSettings.filter(
+                                initialSettings={userLineSettings.filter(
                                     (setting) => setting.favorite_flag === 1,
                                 )}
-                                onChange={handleChange}
-                                onToggle={handleToggle}
-                                onSubmit={handleSubmit}
-                                processing={processing}
+                                onSettingsSaved={() =>
+                                    setLocalIsLineConnected(true)
+                                }
                             />
                         )}
                     </div>

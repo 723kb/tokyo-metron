@@ -1,6 +1,8 @@
 import React from "react";
 import LineNotificationSetting from "@/Components/LineNotificationSetting";
 import ActionLink from "@/Components/ActionLink";
+import { useNotificationSettings } from "@/hooks/useNotificationSettings";
+import MessageAlert from "@/Components/MessageAlert";
 
 /**
  * 通知設定フォームコンポーネント
@@ -14,35 +16,52 @@ import ActionLink from "@/Components/ActionLink";
  * @param {boolean} props.processing - 処理中フラグ
  * @returns {JSX.Element} 通知設定フォーム
  */
-const NotificationSettingsForm = ({
-    settings,
-    onChange,
-    onToggle,
-    onSubmit,
-    processing,
-}) => {
+const NotificationSettingsForm = ({ initialSettings, onSettingsSaved }) => {
+    const {
+        data,
+        processing,
+        message,
+        isChanged,
+        isSubmitting,
+        handleChange,
+        handleToggle,
+        handleSubmit,
+    } = useNotificationSettings(initialSettings);
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const result = await handleSubmit(e);
+        if (result && result.success) {
+            onSettingsSaved();
+        }
+    };
+
     return (
-        <form
-            onSubmit={(e) => {
-                e.preventDefault(); // デフォルトのフォーム送信動作を防止
-                onSubmit(e); // カスタムの送信ハンドラを呼び出し
-            }}
-        >
+        <form onSubmit={onSubmit}>
+            {message && (
+                <MessageAlert message={message.text} type={message.type} />
+            )}
+            {isChanged && !isSubmitting && (
+                <MessageAlert
+                    message="保存が完了していない設定があります。「設定を保存」ボタンを押してください。"
+                    type="warning"
+                />
+            )}
             {/* 各設定項目をマップして表示 */}
-            {settings.map((setting, index) => (
+            {data.userLineSettings.map((setting, index) => (
                 <LineNotificationSetting
                     key={setting.id}
                     setting={setting}
                     index={index}
-                    handleChange={onChange}
-                    handleToggle={onToggle}
+                    handleChange={handleChange}
+                    handleToggle={handleToggle}
                 />
             ))}
             <div className="flex justify-center">
-            {/* 設定保存ボタン */}
-            <ActionLink onClick={onSubmit} disabled={processing}>
-                <span className="block w-full">設定を保存</span>
-            </ActionLink>
+                {/* 設定保存ボタン */}
+                <ActionLink onClick={onSubmit} disabled={processing}>
+                    <span className="block w-full">設定を保存</span>
+                </ActionLink>
             </div>
         </form>
     );
