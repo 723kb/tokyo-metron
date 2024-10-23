@@ -1,13 +1,10 @@
 import { useEffect } from "react";
 import Checkbox from "@/Components/Checkbox";
 import GuestLayout from "@/Layouts/GuestLayout";
-import InputError from "@/Components/InputError";
-import InputLabel from "@/Components/InputLabel";
-import PrimaryButton from "@/Components/PrimaryButton";
-import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
-import FormField from "@/Components/FormField";
+import ActionLink from "@/Components/ActionLink";
+import InputField from "@/Components/InputField";
 
 export default function Login({ status, canResetPassword }) {
     const { t } = useTranslation();
@@ -38,10 +35,9 @@ export default function Login({ status, canResetPassword }) {
                     {status}
                 </div>
             )}
-            <div className="w-full sm:max-w-md mx-auto mt-10 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+            <div className="w-full sm:max-w-2xl mx-auto mt-10 md:mt-20 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <form onSubmit={submit}>
-
-                        <FormField
+                    <InputField
                         id="email"
                         label={t("Email")}
                         type="email"
@@ -51,8 +47,7 @@ export default function Login({ status, canResetPassword }) {
                         placeholder="example@example.com"
                     />
 
-
-                        <FormField
+                    <InputField
                         id="password"
                         label="パスワード(半角英数8文字以上)"
                         type="password"
@@ -77,7 +72,7 @@ export default function Login({ status, canResetPassword }) {
                         </label>
                     </div>
 
-                    <div className="flex items-center justify-end mt-4">
+                    <div className="flex items-center justify-around mt-4">
                         {canResetPassword && (
                             <Link
                                 href={route("password.request")}
@@ -87,9 +82,13 @@ export default function Login({ status, canResetPassword }) {
                             </Link>
                         )}
 
-                        <PrimaryButton className="ms-4" disabled={processing}>
-                            {t("log_in")}
-                        </PrimaryButton>
+                        <ActionLink
+                            onClick={submit}
+                            className="font-semibold bg-blue-500 text-white hover:bg-blue-700 focus:bg-blue-500 active:bg-blue-700"
+                            disabled={processing}
+                        >
+                            <span className="block w-full">{t("log_in")}</span>
+                        </ActionLink>
                     </div>
                 </form>
             </div>

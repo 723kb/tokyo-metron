@@ -9,25 +9,17 @@ import ActionLink from "@/Components/ActionLink";
  * @returns {JSX.Element} アクションボタン
  */
 const ActionButton = ({ favorites }) => {
-    // お気に入りが登録されていない場合
-    if (favorites.length === 0) {
-        return (
-            <ActionLink
-                href={route("favorites.create")}
-                className="bg-blue-600 hover:bg-blue-400 text-white font-semibold"
-            >
-                <span className="block w-full">登録</span>
-            </ActionLink>
-        );
-    }
+    const themeColor = favorites.length === 0 ? "blue" : "green";
+    const btnText = favorites.length === 0 ? "登録" : "更新";
+    const routeName =
+        favorites.length === 0 ? "favorites.create" : "favorites.edit";
 
-    // お気に入りが1つ以上登録されている場合
     return (
         <ActionLink
-            href={route("favorites.edit")}
-            className="bg-green-600 hover:bg-green-400 text-white font-semibold"
+            href={route(routeName)}
+            className={`font-semibold bg-${themeColor}-500 text-white hover:bg-${themeColor}-700 focus:bg-${themeColor}-500 active:bg-${themeColor}-700`}
         >
-            <span className="block w-full">更新</span>
+            <span className="block w-full">{btnText}</span>
         </ActionLink>
     );
 };

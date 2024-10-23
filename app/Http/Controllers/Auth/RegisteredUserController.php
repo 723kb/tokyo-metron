@@ -67,30 +67,37 @@ class RegisteredUserController extends Controller
         // セッションからデータを削除
         Session::forget('registration_data');
 
-        // 登録結果画面にリダイレクト
-        Session::put('registered_user', $user);
-        return redirect()->route('register.result');
+        // ユーザーを自動的にログイン
+        Auth::login($user);
+
+        // // 登録したらログインするように変更
+        // // 登録結果画面にリダイレクト
+        // Session::put('registered_user', $user);
+        // return redirect()->route('register.result');
+
+        // メインページにリダイレクト
+        return redirect(RouteServiceProvider::HOME);
     }
 
-    // 4.結果画面表示
-    public function showResult(Request $request)
-    {
-        // セッションからユーザー情報を取得
-        $user = Session::get('registered_user');
+    // // 4.結果画面表示
+    // public function showResult(Request $request)
+    // {
+    //     // セッションからユーザー情報を取得
+    //     $user = Session::get('registered_user');
 
-        // ユーザー情報が存在しない場合は登録画面にリダイレクト
-        if (!$user) {
-            return redirect()->route('register');
-        }
+    //     // ユーザー情報が存在しない場合は登録画面にリダイレクト
+    //     if (!$user) {
+    //         return redirect()->route('register');
+    //     }
 
-        // 会員登録結果画面をレンダリング
-        return Inertia::render('Auth/RegisterResult', [
-            'data' => [
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
-        ]);
-        // セッションからデータを削除
-        Session::forget('registered_user');
-    }
+    //     // 会員登録結果画面をレンダリング
+    //     return Inertia::render('Auth/RegisterResult', [
+    //         'data' => [
+    //             'name' => $user->name,
+    //             'email' => $user->email,
+    //         ]
+    //     ]);
+    //     // セッションからデータを削除
+    //     Session::forget('registered_user');
+    // }
 }

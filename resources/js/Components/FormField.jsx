@@ -18,6 +18,7 @@ import TextInput from "@/Components/TextInput";
  * @param {string} props.className - 追加のCSSクラス
  * @param {Object} props.style - インラインスタイル（主にチェックボックスのラベルに適用）
  * @param {string} props.placeholder - 入力フィールドのプレースホルダーテキスト
+ * @param {boolean} props.isFavoritePage = false, // お気に入りフォームで専用のスタイルを当てるためのプロパティ
  * @returns {JSX.Element} フォームフィールド
  */
 const FormField = ({
@@ -30,7 +31,16 @@ const FormField = ({
     className,
     style,
     placeholder,
+    isFavoritePage = false,
 }) => {
+    const checkboxLabelClass = isFavoritePage
+        ? "w-full ml-2 flex items-center rounded  transition duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+        : "ml-2 text-gray-700 cursor-pointer";
+
+    const checkboxSpanClass = isFavoritePage
+        ? "text-lg text-white font-semibold py-2 px-4"
+        : "";
+
     return (
         <div className="mt-4">
             {type === "checkbox" ? (
@@ -46,12 +56,10 @@ const FormField = ({
                     />
                     <label
                         htmlFor={id}
-                        className="w-full ml-2 flex items-center rounded  transition duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg cursor-pointer"
-                        style={style}
+                        className={checkboxLabelClass}
+                        style={{ ...style, ...(isFavoritePage ? {} : {}) }}
                     >
-                        <span className="text-lg text-white font-semibold py-2 px-4">
-                            {label}
-                        </span>
+                        <span className={checkboxSpanClass}>{label}</span>
                     </label>
                 </div>
             ) : (

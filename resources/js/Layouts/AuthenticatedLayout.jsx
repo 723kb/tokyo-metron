@@ -13,7 +13,11 @@ import ActionLink from "@/Components/ActionLink";
  * @param {React.ReactNode} props.children - 子コンポーネント
  * @returns {JSX.Element} 認証済みユーザー向けレイアウトを含むReactコンポーネント
  */
-export default function Authenticated({ children }) {
+export default function Authenticated({
+    children,
+    backUrl,
+    hideBackButton = false,
+}) {
     /**
      * 現在のURLを取得
      *
@@ -27,6 +31,15 @@ export default function Authenticated({ children }) {
      * @type {boolean}
      */
     const isMainPage = url === "/main" || url === "/";
+
+    /** 「戻る」で戻る先を指定 */
+    const handleBack = () => {
+        if (backUrl) {
+            window.location.href = backUrl;
+        } else {
+            window.history.back(); // 指定がなければブラウザの履歴を元に戻る
+        }
+    };
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -46,13 +59,15 @@ export default function Authenticated({ children }) {
             </main>
             {/* メインページ以外で「戻る」「メインに戻る」ボタンを表示 */}
             {!isMainPage && (
-                <div className="flex justify-center my-4">
-                    <ActionLink
-                        onClick={() => window.history.back()}
-                        className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4"
-                    >
-                        <span className="block w-full">戻る</span>
-                    </ActionLink>
+                <div className="flex flex-row items-center justify-center space-x-8 my-4 px-4">
+                    {!hideBackButton && (
+                        <ActionLink
+                            onClick={handleBack}
+                            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 sm:mr-4"
+                        >
+                            <span className="block w-full">戻る</span>
+                        </ActionLink>
+                    )}
                     <NavigationButton isAuthenticated={true} />
                 </div>
             )}

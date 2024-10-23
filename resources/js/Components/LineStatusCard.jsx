@@ -12,7 +12,6 @@ import StatusDisplay from "./StatusDisplay";
  * @param {string} props.lineColor - 路線のカラーコード
  * @param {string} props.status - 運行状況
  * @param {string} props.content - 運行状況の詳細内容
- * @param {number} props.commentCount - コメント数
  * @param {boolean} props.isAuthenticated - ユーザーが認証されているかどうか
  * @returns {JSX.Element} 路線状況カード
  */
@@ -22,7 +21,6 @@ const LineStatusCard = ({
     lineColor,
     status,
     content,
-    commentCount,
     isAuthenticated,
 }) => {
     // カードの内容を定義
@@ -38,8 +36,6 @@ const LineStatusCard = ({
             <p className="mt-2 text-sm text-white [text-shadow:_1px_1px_2px_rgba(0,0,0,0.5)]">
                 {content}
             </p>
-            {/* コメント数 */}
-            <CommentCount count={commentCount} />
         </div>
     );
 

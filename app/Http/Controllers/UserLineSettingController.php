@@ -3,23 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\UserLineSetting;
-use App\Models\Line;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
+use App\Services\UserLineSettingService;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class UserLineSettingController extends Controller
 {
+    // UserLineSettingServiceのインスタンスを保持(サービスファイルに分けたものを使うので記載)
+    protected $service;
+
+    public function __construct(UserLineSettingService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * お気に入りの一覧を表示
      */
     public function index()
     {
-        // 現在のユーザーのお気に入り路線(favorite_flagが true=1 )のものを取得
-        $favorites = UserLineSetting::where('user_id', Auth::id())
-            ->where('favorite_flag', true)
-            ->with('line')  // 関連する路線情報も取得
-            ->get();
+        // サービスを使用してお気に入りを取得
+        $favorites = $this->service->getFavoriteLineSettings();
 
         // FavoriteListコンポーネントをレンダリング
         return Inertia::render('FavoriteList', [
@@ -33,10 +39,8 @@ class UserLineSettingController extends Controller
      */
     public function create()
     {
-        // 丸ノ内線支線を除く全路線を取得
-        $lines = Line::where('name', '!=', '丸ノ内線支線')
-            ->select('id', 'name', 'color_code')
-            ->get();
+        // サービスを使用して路線一覧を取得
+        $lines = $this->service->getLines();
 
         // FavoriteListコンポーネントをレンダリング
         return Inertia::render('FavoriteCreate', [
@@ -55,16 +59,8 @@ class UserLineSettingController extends Controller
             'selectedLines.*' => 'exists:lines,id',  // 選択された各路線IDがlinesテーブルに存在すること
         ]);
 
-        // 選択された各路線をお気に入りとして保存
-        foreach ($validated['selectedLines'] as $lineId) {
-            UserLineSetting::updateOrCreate(
-                [
-                    'user_id' => Auth::id(),
-                    'line_id' => $lineId,
-                ],
-                ['favorite_flag' => true]
-            );
-        }
+        // サービスを使用してお気に入りを保存
+        $this->service->storeFavorites($validated['selectedLines']);
 
         // お気に入り一覧ページにリダイレクト
         return redirect()->route('favorites.index')
@@ -72,28 +68,13 @@ class UserLineSettingController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * お気に入りを更新するフォームを表示
      */
     public function edit()
     {
-        $user = Auth::user();
-        // 丸ノ内線支線を除く全路線を取得
-        $lines = Line::where('name', '!=', '丸ノ内線支線')
-            ->select('id', 'name', 'color_code')
-            ->get();
-        // ユーザーのお気に入り路線IDを取得
-        $favoriteLineIds = UserLineSetting::where('user_id', $user->id)
-            ->where('favorite_flag', true)
-            ->pluck('line_id')
-            ->toArray();
+        // サービスを使用して路線一覧とお気に入り路線IDを取得
+        $lines = $this->service->getLines();
+        $favoriteLineIds = $this->service->getFavoriteLineIds();
 
         // FavoriteEditコンポーネントをレンダリング
         return Inertia::render('FavoriteEdit', [
@@ -113,22 +94,10 @@ class UserLineSettingController extends Controller
             'selectedLines.*' => 'exists:lines,id',
         ]);
 
-        $userId = Auth::id();
+        // サービスを使用してお気に入りを更新
+        $this->service->updateFavorites($validated['selectedLines']);
 
-        // 全てのお気に入りを一旦 false = 0 に設定
-        UserLineSetting::where('user_id', $userId)->update(['favorite_flag' => false]);
-
-        // 選択された路線を true=1 に設定
-        foreach ($validated['selectedLines'] as $lineId) {
-            UserLineSetting::updateOrCreate(
-                [
-                    'user_id' => $userId,
-                    'line_id' => $lineId,
-                ],
-                ['favorite_flag' => true]
-            );
-        }
-
+        // お気に入り一覧ページにリダイレクト
         return redirect()->route('favorites.index')
             ->with('message', 'お気に入りを更新しました！');
     }
@@ -138,18 +107,102 @@ class UserLineSettingController extends Controller
      */
     public function destroy($id)
     {
-        // 指定されたIDのお気に入り設定を取得
-        $favorite = UserLineSetting::findOrFail($id);
-        // ユーザーが自分のお気に入りのみを削除できるようにチェック
-        if (Auth::id() !== $favorite->user_id) {
-            abort(403, 'このお気に入りを削除する権限がありません。');
+        try {
+            // サービスを使用してお気に入りを削除
+            $this->service->deleteFavorite($id);
+
+            // お気に入り一覧ページにリダイレクト
+            return redirect()->route('favorites.index')
+                ->with('message', 'お気に入りを削除しました！');
+        } catch (\Exception $e) {
+            // エラーが発生した場合は前のページに戻る
+            return back()->with('error', $e->getMessage());
         }
+    }
 
-        // お気に入り設定を削除
-        $favorite->delete();
+    /**
+     * 通知設定ページを表示
+     */
+    public function showNotificationSettings()
+    {
+        $user = Auth::user();
 
-        // お気に入り一覧ページにリダイレクト
-        return redirect()->route('favorites.index')
-            ->with('message', 'お気に入りを削除しました！');
+        // サービスを使用してユーザーの路線設定を取得
+        $userLineSettings = $this->service->getFavoriteLineSettings();
+
+        // LINE Notify連携状態を確認
+        $isLineConnected = $user->lineNotifyToken()->exists();
+
+        // LINE Notify用のstateパラメータを生成
+        $state = Str::random(40);  // 40文字のランダムな文字列を生成
+        session(['line_notify_state' => $state]);  // $state(CSRF攻撃を防ぐために使用)をセッションに保存し、後でコールバック時に検証
+
+        // LINE Notify認証URLの生成
+        $lineConnectUrl = 'https://notify-bot.line.me/oauth/authorize?' . http_build_query([  // 配列をクエリ文字列に変換
+            'response_type' => 'code',  // OAuth2.0の認証コードフローを使用
+            'client_id' => config('services.line_notify.client_id'),  //  LINE Notifyで取得したクライアントID
+            'redirect_uri' => route('line-notify.callback'),  // 認証後にリダイレクトされる URL
+            'scope' => 'notify',  //  LINE Notify の通知権限を要求
+            'state' => $state  // 生成したランダムな文字列
+        ]);
+
+        // NotificationSettingsコンポーネントをレンダリング
+        return Inertia::render('NotificationSettings', [
+            'userLineSettings' => $userLineSettings,
+            'lineConnectUrl' => $lineConnectUrl,
+            'isLineConnected' => $isLineConnected,
+        ]);
+    }
+
+    /**
+     * 通知設定を更新
+     */
+    public function updateNotificationSettings(Request $request)
+    {
+        try {
+            // リクエストデータのバリデーション
+            $validatedData = $request->validate([
+                'userLineSettings' => 'required|array',
+                'userLineSettings.*.id' => 'required|exists:user_line_settings,id',
+                'userLineSettings.*.notify_status_flag' => 'required|boolean',
+                'userLineSettings.*.notify_monday' => 'required|boolean',
+                'userLineSettings.*.notify_tuesday' => 'required|boolean',
+                'userLineSettings.*.notify_wednesday' => 'required|boolean',
+                'userLineSettings.*.notify_thursday' => 'required|boolean',
+                'userLineSettings.*.notify_friday' => 'required|boolean',
+                'userLineSettings.*.notify_saturday' => 'required|boolean',
+                'userLineSettings.*.notify_sunday' => 'required|boolean',
+                'userLineSettings.*' => [
+                    'required',
+                    function ($_, $value, $fail) {  // $_はphpのクロージャの引数の仕様により削除するとエラーになる！
+                        // 通知が有効な場合、少なくとも1つの曜日が選択されているか確認
+                        if ($value['notify_status_flag'] && !array_sum(array_slice($value, 2, 7))) {
+                            $fail('通知を有効にする場合は、少なくとも1つの曜日を選択してください。');
+                        }
+                    },
+                ],
+                'notify_start_time' => 'nullable|date_format:H:i:s',
+                'notify_end_time' => 'nullable|date_format:H:i:s',
+                'notify_fixed_time' => 'nullable|date_format:H:i:s',
+            ]);
+
+            // サービスを使用して通知設定を更新
+            $this->service->updateNotificationSettings($validatedData['userLineSettings']);
+
+            // 最新のユーザー設定を取得
+            $userLineSettings = $this->service->getFavoriteLineSettings();
+
+            return  Inertia::render('NotificationSettings', [
+                'userLineSettings' => $userLineSettings,
+                'flashMessage' => '通知設定を更新しました。'
+            ]);
+        } catch (\Exception $e) {
+            // エラーをログに記録
+            Log::error('Error updating settings: ' . $e->getMessage());
+            return Inertia::render('NotificationSettings', [
+                'userLineSettings' => $this->service->getFavoriteLineSettings(),
+                'flashMessage' => 'エラーが発生しました。'
+            ])->with('errors', [$e->getMessage()]);
+        }
     }
 }

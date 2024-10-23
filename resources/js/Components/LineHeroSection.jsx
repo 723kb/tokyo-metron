@@ -13,12 +13,12 @@ import React from "react";
 const LineHeroSection = ({ lineName, lineColor }) => {
     return (
         <div
-            className="relative h-[200px]"
+            className="relative h-[150px] sm:h-[175px] md:h-[200px]"
             style={{ backgroundColor: lineColor }}
         >
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="w-1/2 text-center bg-white bg-opacity-85 p-6 rounded-lg">
-                    <h1 className="text-4xl font-bold mb-2">{lineName}</h1>
+            <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+            <div className="w-1/2 text-center bg-white bg-opacity-85 p-6 rounded-lg">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{lineName}</h1>
                 </div>
             </div>
         </div>

@@ -34,7 +34,7 @@ const StatusUpdateDetails = ({
                     onClick={onCommentClick}
                     className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
                 >
-                    コメントする
+                    <span className="block w-full">コメントする</span>
                 </ActionLink>
             )}
             {/* コメント数 */}

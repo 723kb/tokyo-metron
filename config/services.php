@@ -34,4 +34,12 @@ return [
     'odpt' => [
         'key' => env('ODPT_API_KEY'),
     ],
+
+    // デプロイ時にはenvファイルを本番用にする！
+    'line_notify' => [
+        'client_id' => env('LINE_NOTIFY_CLIENT_ID'),
+        'client_secret' => env('LINE_NOTIFY_CLIENT_SECRET'),
+        'redirect_uri' => env('LINE_NOTIFY_REDIRECT_URI'), 
+    ],
+
 ];

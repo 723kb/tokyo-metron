@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="東京メトロ運行状況共有サービス">
         <meta name="keywords" content="東京メトロ,運行状況,地下鉄">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- ファビコン -->
         <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}" type="image/x-icon" />
         <!-- アイコン -->

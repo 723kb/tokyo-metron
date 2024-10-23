@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import GuestLayout from "@/Layouts/GuestLayout";
-import PrimaryButton from "@/Components/PrimaryButton";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
 import ErrorDisplay from "@/Components/ErrorDisplay";
-import FormField from "@/Components/FormField";
+import ActionLink from "@/Components/ActionLink";
+import InputField from "@/Components/InputField";
 
 /**
  * 会員登録フォームコンポーネント
@@ -124,11 +124,11 @@ export default function Register() {
         <GuestLayout>
             <Head title={t("Register")} />
 
-            <div className="w-full sm:max-w-md mx-auto mt-10 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+            <div className="w-full sm:max-w-2xl mx-auto mt-10 md:mt-20 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <form onSubmit={submit}>
                     <ErrorDisplay message={globalError} />
 
-                    <FormField
+                    <InputField
                         id="name"
                         label={t("Name")}
                         value={data.name}
@@ -137,7 +137,7 @@ export default function Register() {
                         placeholder="めとろん"
                     />
 
-                    <FormField
+                    <InputField
                         id="email"
                         label={t("Email")}
                         type="email"
@@ -147,7 +147,7 @@ export default function Register() {
                         placeholder="example@example.com"
                     />
 
-                    <FormField
+                    <InputField
                         id="password"
                         label="パスワード(半角英数8文字以上)"
                         type="password"
@@ -157,7 +157,7 @@ export default function Register() {
                         placeholder="Password123"
                     />
 
-                    <FormField
+                    <InputField
                         id="password_confirmation"
                         label={t("Confirm Password")}
                         type="password"
@@ -169,7 +169,7 @@ export default function Register() {
                         placeholder="Password123"
                     />
 
-                    <div className="flex items-center justify-end mt-4">
+                    <div className="flex items-center justify-around mt-4">
                         <Link
                             href={route("login")}
                             className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -177,9 +177,13 @@ export default function Register() {
                             {t("Already registered?")}
                         </Link>
 
-                        <PrimaryButton className="ms-4" disabled={processing}>
-                            {t("Confirm")}
-                        </PrimaryButton>
+                        <ActionLink
+                            onClick={submit}
+                            className="font-semibold bg-blue-500  border-blue-500 text-white hover:bg-blue-700 focus:bg-blue-500 active:bg-blue-700"
+                            disabled={processing}
+                        >
+                            <span className="block w-full">確認</span>
+                        </ActionLink>
                     </div>
                 </form>
             </div>

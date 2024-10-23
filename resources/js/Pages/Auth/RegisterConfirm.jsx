@@ -1,8 +1,7 @@
 import GuestLayout from "@/Layouts/GuestLayout";
-import PrimaryButton from "@/Components/PrimaryButton";
 import { Head, useForm, usePage } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
-import SecondaryButton from "@/Components/SecondaryButton";
+import ActionLink from "@/Components/ActionLink";
 
 /**
  * 会員登録確認画面コンポーネント
@@ -65,7 +64,7 @@ export default function RegisterConfirm() {
         <GuestLayout>
             <Head title="会員登録確認" />
 
-            <div className="w-full sm:max-w-md mx-auto mt-10 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+            <div className="w-full sm:max-w-2xl mx-auto mt-10 md:mt-20 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
                     会員登録確認
                 </h2>
@@ -97,13 +96,20 @@ export default function RegisterConfirm() {
                             <span>非表示にしています</span>
                         </div>
                     </div>
-                    <div className="flex items-center justify-between mt-8">
-                        <SecondaryButton onClick={handleEdit} type="button">
-                            修正
-                        </SecondaryButton>
-                        <PrimaryButton disabled={processing}>
-                            登録
-                        </PrimaryButton>
+                    <div className="flex justify-center space-x-8 m-4">
+                        <ActionLink
+                            onClick={handleEdit}
+                            className="font-semibold bg-gray-300 text-gray-800 hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-500"
+                        >
+                            <span className="block w-full">修正</span>
+                        </ActionLink>
+                        <ActionLink
+                            onClick={submit}
+                            className="font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600 active:bg-blue-700"
+                            disabled={processing}
+                        >
+                            <span className="block w-full">登録</span>
+                        </ActionLink>
                     </div>
                 </form>
             </div>
