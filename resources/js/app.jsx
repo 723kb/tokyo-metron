@@ -17,7 +17,12 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<I18nextProvider i18n={i18n}><App {...props} /></I18nextProvider>);
+        root.render(
+        <I18nextProvider i18n={i18n}>
+            <App {...props}>
+                
+            </App>
+        </I18nextProvider>);
     },
     progress: {
         color: '#4B5563',

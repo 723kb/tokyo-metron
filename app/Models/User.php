@@ -42,4 +42,44 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+        /**
+     * ユーザーが投稿した運行状況更新を取得
+     */
+    public function statusUpdates()
+    {
+        return $this->hasMany(StatusUpdate::class);
+    }
+
+    /**
+     * ユーザーが投稿したコメントを取得
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * ユーザーが「いいね」したコメントを取得
+     */
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    /**
+     * ユーザーの路線設定を取得
+     */
+    public function userLineSettings()
+    {
+        return $this->hasMany(UserLineSetting::class);
+    }
+
+    /**
+     * ユーザーのLINE Notify設定を取得
+     */
+    public function lineNotifyToken()
+    {
+        return $this->hasOne(LineNotifyToken::class);
+    }
 }
